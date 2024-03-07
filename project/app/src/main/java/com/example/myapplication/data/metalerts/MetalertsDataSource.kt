@@ -25,9 +25,3 @@ class MetalertsDataSource {
         return response.body()
     }
 }
-
-suspend fun main() {
-
-    val response = MetalertsDataSource().fetchMetalertsData()
-    response.features.forEach { println(it) }
-}

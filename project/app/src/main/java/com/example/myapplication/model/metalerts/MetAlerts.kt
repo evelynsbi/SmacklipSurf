@@ -1,6 +1,5 @@
 package com.example.myapplication.model.metalerts
 
-import com.example.myapplication.data.metalerts.Features
 import com.google.gson.annotations.SerializedName
 
 data class MetAlerts (
