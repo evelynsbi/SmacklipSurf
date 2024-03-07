@@ -3,7 +3,8 @@ package com.example.myapplication.model.metalerts
 import com.google.gson.annotations.SerializedName
 
 data class Properties (
-
+    @SerializedName("MunicipalityId"       ) var MunicipalityId       : String?              = null,
+    @SerializedName("administrativeId"     ) var administrativeId     : String?              = null,
     @SerializedName("area"                 ) var area                 : String?              = null,
     @SerializedName("awarenessResponse"    ) var awarenessResponse    : String?              = null,
     @SerializedName("awarenessSeriousness" ) var awarenessSeriousness : String?              = null,
