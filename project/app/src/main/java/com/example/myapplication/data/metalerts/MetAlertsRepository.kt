@@ -2,15 +2,15 @@ package com.example.myapplication.data.metalerts
 
 import com.example.myapplication.model.metalerts.Features
 
-interface MetalertsRepository{
+interface MetAlertsRepository{
     suspend fun getFeatures(): List<Features>
 
 }
 class MetalertsRepositoryImpl (
-    private val metalertsDataSource : MetalertsDataSource = MetalertsDataSource()
-) : MetalertsRepository {
+    private val metalertsDataSource : MetAlertsDataSource = MetAlertsDataSource()
+) : MetAlertsRepository {
     override suspend fun getFeatures(): List<Features> {
-        return metalertsDataSource.fetchMetalertsData().features
+        return metalertsDataSource.fetchMetAlertsData().features
     }
 
 }
