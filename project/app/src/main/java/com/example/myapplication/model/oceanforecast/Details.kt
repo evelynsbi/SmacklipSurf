@@ -1,4 +1,4 @@
-package com.example.myapplication.data.oceanforecast
+package com.example.myapplication.model.oceanforecast
 
 data class Details(
     val sea_surface_wave_from_direction: Double,

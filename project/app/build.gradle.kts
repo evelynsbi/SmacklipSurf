@@ -105,6 +105,10 @@ dependencies {
     val gson2_version = "2.3.6"
     implementation ("com.google.code.gson:gson: $gson2_version")
 
-    // implementation ("io.coil-kt:coil-compose:1.4.0")
 
-    implementation("io.coil-kt:coil-compose:2.5.0") }
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$1.6")
+
+}
