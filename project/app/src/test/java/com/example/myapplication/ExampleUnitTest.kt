@@ -10,6 +10,7 @@ import com.example.myapplication.data.oceanforecast.HoddevikDataSourceDataSource
 import com.example.myapplication.data.oceanforecast.HoddevikRepository
 import com.example.myapplication.model.SurfArea
 import com.example.myapplication.model.oceanforecast.Data
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 
@@ -23,8 +24,8 @@ import java.io.File
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
-
     private val metAlertsRepository: MetAlertsRepositoryImpl = MetAlertsRepositoryImpl()
+
     private val hoddevikDataSourceDataSource = HoddevikDataSourceDataSource()
     private val hoddevikRepository = HoddevikRepository(hoddevikDataSourceDataSource)
 
@@ -43,13 +44,18 @@ class ExampleUnitTest {
     fun testMetAlertsAreaNameWithProxy() = runBlocking {
         val feature = metAlertsRepository.getFeatures()[0]
         println(feature.properties?.area)
-        assert(true)
     }
 
     @Test
-    fun getRelevantAlertsForHoddevik() = runBlocking {
-        val features = metAlertsRepository.getFeatures()
-        val relevantAlerts = metAlertsRepository.getRelevantAlertsFor(SurfArea.HODDEVIK, features)
+    fun getRelevantAlertsForFedjeByApiCall() = runBlocking {
+        val features = async {metAlertsRepository.getFeatures()}
+        val relevantAlerts = metAlertsRepository.getRelevantAlertsFor(SurfArea.FEDJE, features.await())
+        println(relevantAlerts)
         relevantAlerts.forEach { println("Alert: $it") }
+    }
+
+    @Test
+    fun getRelevantAlertsForNordkapp() {
+
     }
 }

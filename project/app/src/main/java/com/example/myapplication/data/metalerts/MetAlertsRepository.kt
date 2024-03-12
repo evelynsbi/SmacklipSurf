@@ -9,8 +9,8 @@ interface MetAlertsRepository{
 
 }
 class MetAlertsRepositoryImpl (
-
     private val metAlertsDataSource : MetAlertsDataSource = MetAlertsDataSource()
+
 ) : MetAlertsRepository {
 
     private var allFeatures: List<Features> = listOf()
@@ -18,8 +18,6 @@ class MetAlertsRepositoryImpl (
         allFeatures = metAlertsDataSource.fetchMetAlertsData().features
         return allFeatures
     }
-
-
 
 
     private fun inArea(lat: Double, lon: Double, surfArea: SurfArea, radius: Double = 0.1): Boolean {
@@ -36,8 +34,8 @@ class MetAlertsRepositoryImpl (
             if (feature.geometry?.type == "Polygon") {
                 coordinates?.forEach {i ->
                     i.forEach { j ->
-                        val lat = j[0] as Double
-                        val lon = j[1] as Double
+                        val lon = j[0] as Double
+                        val lat = j[1] as Double
                         if (inArea(lat, lon, surfArea)) {
                             feature.properties?.area?.let { relevantAlerts.add(it) }
                         }
@@ -48,8 +46,8 @@ class MetAlertsRepositoryImpl (
                     i.forEach { j ->
                         j.forEach { k ->
                             val coords = k as List<*>
-                            val lat = coords[0] as Double
-                            val lon = coords[1] as Double
+                            val lon = coords[0] as Double
+                            val lat = coords[1] as Double
                             if (inArea(lat, lon, surfArea)) {
                                 feature.properties?.area?.let { relevantAlerts.add(it) }
                             }
@@ -58,7 +56,7 @@ class MetAlertsRepositoryImpl (
                 }
             }
         }
-        return relevantAlerts.toList()
+        return relevantAlerts
     }
 
 }
