@@ -27,8 +27,8 @@ class MetAlertsRepositoryImpl (
         )
     }
 
-    fun getRelevantAlertsFor(surfArea: SurfArea, allFeatures: List<Features>): List<String> {
-        val relevantAlerts: MutableList<String> = mutableListOf()
+    fun getRelevantAlertsFor(surfArea: SurfArea, allFeatures: List<Features>): List<Features> {
+        val relevantAlerts: MutableList<Features> = mutableListOf()
         allFeatures.forEach() {feature ->
             val coordinates = feature.geometry?.coordinates
             if (feature.geometry?.type == "Polygon") {
@@ -37,7 +37,7 @@ class MetAlertsRepositoryImpl (
                         val lon = j[0] as Double
                         val lat = j[1] as Double
                         if (inArea(lat, lon, surfArea)) {
-                            feature.properties?.area?.let { relevantAlerts.add(it) }
+                            feature.let { relevantAlerts.add(it) }
                         }
                     }
                 }
@@ -49,7 +49,7 @@ class MetAlertsRepositoryImpl (
                             val lon = coords[0] as Double
                             val lat = coords[1] as Double
                             if (inArea(lat, lon, surfArea)) {
-                                feature.properties?.area?.let { relevantAlerts.add(it) }
+                                feature.let { relevantAlerts.add(it) }
                             }
                         }
                     }
