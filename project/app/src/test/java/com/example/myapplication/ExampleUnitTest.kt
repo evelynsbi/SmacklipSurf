@@ -1,12 +1,14 @@
 package com.example.myapplication
 
 
+import com.example.myapplication.data.metalerts.MetAlertsRepository
 import com.example.myapplication.model.metalerts.MetAlerts
 import com.google.gson.Gson
 import com.example.myapplication.data.metalerts.MetAlertsRepositoryImpl
 import kotlinx.coroutines.runBlocking
 import com.example.myapplication.data.oceanforecast.HoddevikDataSourceDataSource
 import com.example.myapplication.data.oceanforecast.HoddevikRepository
+import com.example.myapplication.model.SurfArea
 import com.example.myapplication.model.oceanforecast.Data
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -22,7 +24,7 @@ import java.io.File
  */
 class ExampleUnitTest {
 
-    private val repo = MetAlertsRepositoryImpl()
+    private val metAlertsRepository: MetAlertsRepositoryImpl = MetAlertsRepositoryImpl()
     private val hoddevikDataSourceDataSource = HoddevikDataSourceDataSource()
     private val hoddevikRepository = HoddevikRepository(hoddevikDataSourceDataSource)
 
@@ -39,9 +41,15 @@ class ExampleUnitTest {
     }
     @Test
     fun testMetAlertsAreaNameWithProxy() = runBlocking {
-        val feature = repo.getFeatures()[0]
+        val feature = metAlertsRepository.getFeatures()[0]
         println(feature.properties?.area)
         assert(true)
     }
 
+    @Test
+    fun getRelevantAlertsForHoddevik() = runBlocking {
+        val features = metAlertsRepository.getFeatures()
+        val relevantAlerts = metAlertsRepository.getRelevantAlertsFor(SurfArea.HODDEVIK, features)
+        relevantAlerts.forEach { println("Alert: $it") }
+    }
 }

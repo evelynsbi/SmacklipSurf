@@ -6,27 +6,26 @@ import com.example.myapplication.model.metalerts.Features
 
 interface MetAlertsRepository{
     suspend fun getFeatures(): List<Features>
-    suspend fun getFeaturesHoddevik(): List<Features>
 
 }
 class MetAlertsRepositoryImpl (
 
     private val metAlertsDataSource : MetAlertsDataSource = MetAlertsDataSource()
 ) : MetAlertsRepository {
-    override suspend fun getFeatures(): List<Features> {
-        return metAlertsDataSource.fetchMetAlertsData().features
-    }
 
     private var allFeatures: List<Features> = listOf()
-    override suspend fun getFeaturesHoddevik(): List<Features> {
-        // Fetch all features
+    override suspend fun getFeatures(): List<Features> {
         allFeatures = metAlertsDataSource.fetchMetAlertsData().features
+        return allFeatures
     }
 
-    private fun inArea(lat: Double, long: Double, surfArea: SurfArea, radius: Double = 0.1): Boolean {
+
+
+
+    private fun inArea(lat: Double, lon: Double, surfArea: SurfArea, radius: Double = 0.1): Boolean {
         return (
             lat in surfArea.lat - radius..surfArea.lat + radius &&
-            long in surfArea.long - radius..surfArea.long + radius
+            lon in surfArea.lon - radius..surfArea.lon + radius
         )
     }
 
@@ -38,8 +37,8 @@ class MetAlertsRepositoryImpl (
                 coordinates?.forEach {i ->
                     i.forEach { j ->
                         val lat = j[0] as Double
-                        val long = j[1] as Double
-                        if (inArea(lat, long, surfArea)) {
+                        val lon = j[1] as Double
+                        if (inArea(lat, lon, surfArea)) {
                             feature.properties?.area?.let { relevantAlerts.add(it) }
                         }
                     }
@@ -49,9 +48,9 @@ class MetAlertsRepositoryImpl (
                     i.forEach { j ->
                         j.forEach { k ->
                             val coords = k as List<*>
-                            val lat = k[0] as Double
-                            val long = k[1] as Double
-                            if (inArea(lat, long, surfArea)) {
+                            val lat = coords[0] as Double
+                            val lon = coords[1] as Double
+                            if (inArea(lat, lon, surfArea)) {
                                 feature.properties?.area?.let { relevantAlerts.add(it) }
                             }
                         }
@@ -59,7 +58,7 @@ class MetAlertsRepositoryImpl (
                 }
             }
         }
-        return relevantAlerts
+        return relevantAlerts.toList()
     }
 
 }
