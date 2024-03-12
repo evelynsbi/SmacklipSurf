@@ -17,18 +17,17 @@ class MetAlertsRepositoryImpl (
         return metAlertsDataSource.fetchMetAlertsData().features
     }
 
+    private var allFeatures: List<Features> = listOf()
     override suspend fun getFeaturesHoddevik(): List<Features> {
-
         // Fetch all features
-        val allFeatures: List<Features> = metAlertsDataSource.fetchMetAlertsData().features
-        return allFeatures
+        allFeatures = metAlertsDataSource.fetchMetAlertsData().features
     }
 
     private fun inArea(lat: Double, long: Double, surfArea: SurfArea, radius: Double = 0.1): Boolean {
         return (
-                lat in surfArea.lat - radius..surfArea.lat + radius &&
-                        long in surfArea.long - radius..surfArea.long + radius
-                )
+            lat in surfArea.lat - radius..surfArea.lat + radius &&
+            long in surfArea.long - radius..surfArea.long + radius
+        )
     }
 
     fun getRelevantAlertsFor(surfArea: SurfArea, allFeatures: List<Features>): List<String> {
@@ -42,6 +41,19 @@ class MetAlertsRepositoryImpl (
                         val long = j[1] as Double
                         if (inArea(lat, long, surfArea)) {
                             feature.properties?.area?.let { relevantAlerts.add(it) }
+                        }
+                    }
+                }
+            } else if (feature.geometry?.type == "MultiPolygon") {
+                coordinates?.forEach { i ->
+                    i.forEach { j ->
+                        j.forEach { k ->
+                            val coords = k as List<*>
+                            val lat = k[0] as Double
+                            val long = k[1] as Double
+                            if (inArea(lat, long, surfArea)) {
+                                feature.properties?.area?.let { relevantAlerts.add(it) }
+                            }
                         }
                     }
                 }

@@ -80,7 +80,6 @@ dependencies {
 
 
     val compose_version = "1.0.5"
-    implementation("io.ktor:ktor-client-json:$ktor_version")
 
 
     implementation("io.ktor:ktor-client-android:$ktor_version")
