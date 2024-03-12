@@ -1,7 +1,6 @@
 package com.example.myapplication.data.metalerts
 
 import com.example.myapplication.model.metalerts.Features
-import com.example.myapplication.model.metalerts.Geometry
 
 interface MetAlertsRepository{
     suspend fun getFeatures(): List<Features>
@@ -23,31 +22,43 @@ class MetAlertsRepositoryImpl (
 
         // Define a bounding box with approximately a 10 km radius around Hoddevik
         val radiusDegrees = 0.1
-        val minLatitude = hoddevikLatitude - radiusDegrees
-        val maxLatitude = hoddevikLatitude + radiusDegrees
-        val minLongitude = hoddevikLongitude - radiusDegrees
-        val maxLongitude = hoddevikLongitude + radiusDegrees
+        val minLatitudeHoddevik = hoddevikLatitude - radiusDegrees
+        val maxLatitudeHoddevik = hoddevikLatitude + radiusDegrees
+        val minLongitudeHoddevik = hoddevikLongitude - radiusDegrees
+        val maxLongitudeHoddevik = hoddevikLongitude + radiusDegrees
 
+        val hoddevikLatLongArea = listOf(
+            minLatitudeHoddevik,
+            maxLatitudeHoddevik,
+            minLongitudeHoddevik,
+            maxLongitudeHoddevik
+        )
         // Fetch all features
         val allFeatures: List<Features> = metAlertsDataSource.fetchMetAlertsData().features
 
-        allFeatures.forEach(){
-            val coordinates = it.geometry?.coordinates
-            if (it.geometry?.type == "Polygon"){
-                polygonToArray(it.geometry?.coordinates)
-            }
-            else if(it.geometry?.type == "MultiPolygon"){
-                multiPolygonToArray()
-            }
+        fun inArea(lat: Double, long: Double): Boolean {
+            return (lat in hoddevikLatLongArea[0]..hoddevikLatLongArea[1] && long in hoddevikLatLongArea[2]..hoddevikLatLongArea[1])
+        }
 
+        fun getRelevantAlertsFor(surfArea: SurfArea): List<String> {
+            val relevantAlerts: MutableList<String> = mutableListOf()
+            allFeatures.forEach() {feature ->
+                val coordinates = feature.geometry?.coordinates
+                if (feature.geometry?.type == "Polygon") {
+                    coordinates?.forEach {i ->
+                        i.forEach { j ->
+                            val lat = j[0] as Double
+                            val long = j[1] as Double
+                            if (inArea(lat, long)) {
+                                feature.properties?.area?.let { relevantAlerts.add(it) }
+                            }
+                        }
+                    }
+                }
+            }
+            return relevantAlerts
         }
     }
 
-    suspend fun multiPolygonToArray(polygon: List<List<Double>>){
-
-    }
-    suspend fun polygonToArray(polygon: List<List<Double>>){
-
-    }
 
 }
