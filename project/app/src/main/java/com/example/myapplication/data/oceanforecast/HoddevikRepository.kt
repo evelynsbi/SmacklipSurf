@@ -3,7 +3,7 @@ package com.example.myapplication.data.oceanforecast
 import com.example.myapplication.model.oceanforecast.Data
 import com.example.myapplication.model.oceanforecast.Timeserie
 
-class HoddevikRepository(private val dataSource: HoddevikDataSourceDataSource) {
+class HoddevikRepository(private val dataSource: HoddevikDataSource) {
     //vet ikke hva som er best practice: ha datasource som argument eller ha det inni klassen
 
     suspend fun getTimeSeries(): List<Pair<String, Data>> {
