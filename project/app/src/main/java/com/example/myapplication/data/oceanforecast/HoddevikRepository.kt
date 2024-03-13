@@ -14,6 +14,13 @@ class HoddevikRepository(private val dataSource: HoddevikDataSourceDataSource) {
         return timeSeries.map {it.time to it.data}
     }
 
+    suspend fun getWaveHeights(): List<Pair<String, Double>> {
+        val timeSeries = getTimeSeries();
+        return timeSeries.map { it.first to findWaveHeightFromData(it.second)}
+    }
 
+    private fun findWaveHeightFromData(data: Data): Double {
+        return data.instant.details.sea_surface_wave_height
+    }
 
 }
