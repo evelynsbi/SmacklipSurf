@@ -3,7 +3,7 @@ package com.example.myapplication.data.oceanforecast
 import com.example.myapplication.model.oceanforecast.Data
 import com.example.myapplication.model.oceanforecast.Timeserie
 
-class HoddevikRepository(private val dataSource: HoddevikDataSource) {
+class HoddevikRepository(private val dataSource: HoddevikDataSourceDataSource) {
     //vet ikke hva som er best practice: ha datasource som argument eller ha det inni klassen
 
     suspend fun getTimeSeries(): List<Pair<String, Data>> {
@@ -14,13 +14,16 @@ class HoddevikRepository(private val dataSource: HoddevikDataSource) {
         return timeSeries.map {it.time to it.data}
     }
 
-    suspend fun getWaveHeights(): List<Pair<String, Double>> {
-        val timeSeries = getTimeSeries();
-        return timeSeries.map { it.first to findWaveHeightFromData(it.second)}
-    }
 
     private fun findWaveHeightFromData(data: Data): Double {
         return data.instant.details.sea_surface_wave_height
     }
+
+    suspend fun getWaveHeights(): List<Pair<String, Double>> {
+        val timeSeries = getTimeSeries();
+        return timeSeries.map { it.first to findWaveHeightFromData(it.second) }
+
+    }
+
 
 }
