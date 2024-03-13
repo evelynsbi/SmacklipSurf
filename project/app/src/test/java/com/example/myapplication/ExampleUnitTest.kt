@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 
+
 import com.example.myapplication.data.metalerts.MetAlertsRepository
 import com.example.myapplication.model.metalerts.MetAlerts
 import com.google.gson.Gson
@@ -10,9 +11,11 @@ import com.example.myapplication.data.oceanforecast.HoddevikDataSourceDataSource
 import com.example.myapplication.data.oceanforecast.HoddevikRepository
 import com.example.myapplication.model.SurfArea
 import com.example.myapplication.model.metalerts.Features
+
 import com.example.myapplication.model.oceanforecast.Data
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+
 import kotlinx.coroutines.test.runTest
 
 import org.junit.Test
@@ -59,9 +62,27 @@ class ExampleUnitTest {
     private val hoddevikDataSourceDataSource = HoddevikDataSourceDataSource()
     private val hoddevikRepository = HoddevikRepository(hoddevikDataSourceDataSource)
 
+    //Met alerts
+    private val repo = MetAlertsRepositoryImpl()
+    
+    //LF
+    private val locationForecastDataSource = LocationForecastDataSource()
+    private val locationForecastRepository = LocationForecastRepository(locationForecastDataSource)
+    private val hoddevikDataSourceDataSource = HoddevikDataSourceDataSource()
+    private val hoddevikRepository = HoddevikRepository(hoddevikDataSourceDataSource)
 
     @Test
-    fun addition_isCorrect() = runBlocking{
+    fun locationForecastTimeSeriesExists() = runBlocking {
+        val timeSeries: List<Pair<String, DataLF>> = locationForecastRepository.getTimeSeries()
+        val time1 = timeSeries.get(0).first
+
+        print("$time1 ----------Testen fungerer!----------")
+
+
+    }
+
+    @Test
+    fun oceanForecastTimeSeriesExists() = runBlocking {
 
         val timeSeries: List<Pair<String, Data>> = hoddevikRepository.getTimeSeries()
         val time1 = timeSeries.get(0).first
