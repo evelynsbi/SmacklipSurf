@@ -84,7 +84,7 @@ class HomeScreenViewModel : ViewModel() {
                     else -> R.drawable.icon_awareness_default // Hvis awarenessLevel ikke er 2, 3 eller 4
                 }
             } else {
-                R.drawable.icon_awareness_default // Hvis awarenessLevel er en tom streng
+                R.drawable.icon_awareness_default // Hvis awarenessLevel er en tom String
             }
         } catch (e: Exception) {
             R.drawable.icon_awareness_default
