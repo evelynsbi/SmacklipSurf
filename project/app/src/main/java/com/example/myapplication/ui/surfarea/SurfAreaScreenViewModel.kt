@@ -22,4 +22,12 @@ class SurfAreaScreenViewModel: ViewModel() {
     private val _surfAreaScreenUiState = MutableStateFlow(SurfAreaScreenUiState())
     val surfAreaScreenUiState: StateFlow<SurfAreaScreenUiState> = _surfAreaScreenUiState.asStateFlow()
 
+
+    fun getWindSpeedNext7Days() {
+
+    }
+
+    fun getWaveHeightNext7Days() {
+
+    }
 }
