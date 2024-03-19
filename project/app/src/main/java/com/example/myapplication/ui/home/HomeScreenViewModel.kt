@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class HomeScreenUiState(
-    val locationName : String = "",
-    val windSpeed : List<Pair<String, Double>> = emptyList(),
-    val windGust : List<Pair<String, Double>> = emptyList(),
-    val windDirection : List<Pair<String, Double>> = emptyList(),
-    val waveHeight : List<Pair<String, Double>> = emptyList(),
-    val allRelevantAlerts : List<List<Features>> = emptyList()
+    val locationName: String = "",
+    val windSpeed: List<Pair<List<Int>, Double>> = emptyList(),
+    val windGust: List<Pair<List<Int>, Double>> = emptyList(),
+    val windDirection: List<Pair<String, Double>> = emptyList(),
+    val waveHeight: List<Pair<List<Int>, Double>> = emptyList(),
+    val allRelevantAlerts: List<List<Features>> = emptyList()
 )
 
 class HomeScreenViewModel : ViewModel() {
@@ -51,11 +51,12 @@ class HomeScreenViewModel : ViewModel() {
         }
     }
 
-    fun updateWaveHeight() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _homeScreenUiState.update {
-                val newWaveHeight =
-                    smackLipRepository.getWaveHeights(smackLipRepository.getTimeSeriesOF())
+
+    fun updateWaveHeight(){
+        viewModelScope.launch (Dispatchers.IO){
+            _homeScreenUiState.update{
+                val newWaveHeight = smackLipRepository.getWaveHeights()
+
                 it.copy(waveHeight = newWaveHeight)
             }
         }
@@ -78,13 +79,13 @@ class HomeScreenViewModel : ViewModel() {
                 val firstChar = awarenessLevel.firstOrNull()?.toString()
 
                 when (firstChar) {
-                    "2" -> R.drawable.icon_awareness_yellow
+                  //  "2" -> R.drawable.icon_awareness_yellow
                     "3" -> R.drawable.icon_awareness_orange
                     "4" -> R.drawable.icon_awareness_red
                     else -> R.drawable.icon_awareness_default // Hvis awarenessLevel ikke er 2, 3 eller 4
                 }
             } else {
-                R.drawable.icon_awareness_default // Hvis awarenessLevel er en tom streng
+                R.drawable.icon_awareness_default // Hvis awarenessLevel er en tom String
             }
         } catch (e: Exception) {
             R.drawable.icon_awareness_default
