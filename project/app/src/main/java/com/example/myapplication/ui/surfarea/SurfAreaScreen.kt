@@ -267,7 +267,7 @@ fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: String) {
                 }
                 Column {
                     Text(
-                        text = surfAreaScreenUiState.waveHeights.maxByOrNull{it.second}?.second.toString(),
+                        text = "",
                         style = TextStyle(
                             fontSize = 13.sp,
                             fontWeight = FontWeight(400),

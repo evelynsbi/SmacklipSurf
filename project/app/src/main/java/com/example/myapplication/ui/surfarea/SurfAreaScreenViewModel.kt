@@ -15,10 +15,10 @@ import kotlinx.coroutines.launch
 data class SurfAreaScreenUiState(
     val location: SurfArea? = null,
     val alerts: List<Features> = emptyList(),
-    val waveHeights: List<Pair<List<Int>, Double>> = emptyList(),
-    val windDirections: List<Pair<List<Int>, Double>> = emptyList(),
-    val windSpeeds: List<Pair<List<Int>, Double>> = emptyList(),
-    val windSpeedOfGusts: List<Pair<List<Int>, Double>> = emptyList(),
+    val waveHeights: List<List<Pair<List<Int>, Double>>> = emptyList(),
+    val windDirections: List<List<Pair<List<Int>, Double>>> = emptyList(),
+    val windSpeeds: List<List<Pair<List<Int>, Double>>> = emptyList(),
+    val windSpeedOfGusts: List<List<Pair<List<Int>, Double>>> = emptyList(),
     val forecast7Days: MutableList<List<Pair<List<Int>, List<Double>>>> = mutableListOf()
 
     )
@@ -84,7 +84,10 @@ class SurfAreaScreenViewModel: ViewModel() {
                 val newForecast7Days = smackLipRepository.getDataForTheNext7Days(surfArea)
                 it.copy(
                     forecast7Days = newForecast7Days,
-                    waveHeights = newForecast7Days
+                    waveHeights = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[0]}},
+                    windDirections = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[1]}},
+                    windSpeeds = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[2]}},
+                    windSpeedOfGusts = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[3]}},
                 )
             }
         }
