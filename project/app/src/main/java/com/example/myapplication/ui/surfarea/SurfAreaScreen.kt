@@ -65,7 +65,8 @@ fun SurfAreaScreen(surfArea: SurfArea, surfAreaScreenViewModel: SurfAreaScreenVi
             ) {
                   items(7) { index ->
                       surfAreaScreenViewModel.updateForecastNext7Days(surfArea)
-                      DayPreviewCard(surfAreaScreenUiState, "i dag")
+                      surfAreaScreenViewModel.updateMaxWaveHeights()
+                      DayPreviewCard(surfAreaScreenUiState, index)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -200,7 +201,7 @@ fun HeaderCard() {
     }
 }
 @Composable
-fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: String) {
+fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: Int) {
     Card(
         modifier = Modifier
             .padding(6.dp)
@@ -217,7 +218,16 @@ fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: String) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = day,
+                    text = when (day) {
+                        0 -> "monday"
+                        1 -> "tuesday"
+                        2 -> "wednesday"
+                        3 -> "thursday"
+                        4 -> "friday"
+                        5 -> "saturday"
+                        6 -> "sunday"
+                        else -> "noneday"
+                    },
                     style = TextStyle(
                         fontSize = 9.sp,
                         fontWeight = FontWeight(400),
@@ -267,7 +277,8 @@ fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: String) {
                 }
                 Column {
                     Text(
-                        text = "",
+
+                        text = surfAreaScreenUiState.maxWaveHeights[day].toString(),
                         style = TextStyle(
                             fontSize = 13.sp,
                             fontWeight = FontWeight(400),

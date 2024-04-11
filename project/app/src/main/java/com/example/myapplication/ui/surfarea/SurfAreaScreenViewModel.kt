@@ -79,22 +79,25 @@ class SurfAreaScreenViewModel: ViewModel() {
 //        }
 //    }
 
-    fun updateMaxWaveHeights(): List<Double> {
+    fun updateMaxWaveHeights() {
         viewModelScope.launch {
             _surfAreaScreenUiState.update {state ->
                 state.copy(
-                    maxWaveHeights = state.waveHeights.map {day -> day.maxBy {hour -> hour.second}}.map {it.second}
+                    maxWaveHeights = state.waveHeights.map {
+                        day -> day.maxBy {hour -> hour.second}
+                    }.map {it.second}
                 )
             }
         }
     }
     fun updateForecastNext7Days(surfArea: SurfArea){
         viewModelScope.launch(Dispatchers.IO) {
-            _surfAreaScreenUiState.update {
+            _surfAreaScreenUiState.update {state ->
                 val newForecast7Days = smackLipRepository.getDataForTheNext7Days(surfArea)
-                it.copy(
+                state.copy(
                     forecast7Days = newForecast7Days,
                     waveHeights = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[0]}},
+                    maxWaveHeights = state.waveHeights.map {day -> day.maxBy {hour -> hour.second}}.map {it.second},
                     windDirections = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[1]}},
                     windSpeeds = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[2]}},
                     windSpeedOfGusts = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[3]}},
