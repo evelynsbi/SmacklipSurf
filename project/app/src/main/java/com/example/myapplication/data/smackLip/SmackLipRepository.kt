@@ -142,7 +142,7 @@ class SmackLipRepositoryImpl (
 
     //metoden kaller getDataForOneDay 7 ganger fra og med i dag, og legger til listen med data for hver dag
     //inn i resListe som til slutt består av data med tidspunkt og data for alle 7 dager
-    //MutableList<List<Pair<Time, DataAtTime>>>>    .size=7
+                                                                    //Days<Hours<Pair<Time, DataAtTime>>>>    .size=7
     override suspend fun getDataForTheNext7Days(surfArea: SurfArea): MutableList<List<Pair<List<Int>, List<Double>>>> {
         val today = getWaveHeights(surfArea)[0].first[2] //regner med at det er dumt med et helt api-kall bare for å hente dagens dato
         val resList = mutableListOf<List<Pair<List<Int>, List<Double>>>>()
