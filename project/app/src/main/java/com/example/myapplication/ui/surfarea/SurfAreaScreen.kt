@@ -39,15 +39,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
 import com.example.myapplication.data.smackLip.SmackLipRepository
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
+import com.example.myapplication.model.surfareas.SurfArea
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.ui.theme.SchemesSurface
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SurfAreaScreen(surfAreaScreenViewModel: SurfAreaScreenViewModel = viewModel()) {
+fun SurfAreaScreen(surfArea: SurfArea, surfAreaScreenViewModel: SurfAreaScreenViewModel = viewModel()) {
     val surfAreaScreenUiState: SurfAreaScreenUiState by surfAreaScreenViewModel.surfAreaScreenUiState.collectAsState()
-    val smackLipRepository : SmackLipRepository = SmackLipRepositoryImpl()
     Scaffold {
         Column(
             modifier = Modifier
@@ -64,10 +64,9 @@ fun SurfAreaScreen(surfAreaScreenViewModel: SurfAreaScreenViewModel = viewModel(
                     .padding(16.dp)
             ) {
                   items(7) { index ->
-                    DayPreviewCard("i dag")
+                      surfAreaScreenViewModel.updateForecastNext7Days(surfArea)
+                      DayPreviewCard(surfAreaScreenUiState, "i dag")
                 }
-                //DayPreviewCard(smackLipRepository.getHourlyDataPerDay(surfAreaScreenUiState.toString()))
-                //smackLipRepository.getHourlyDataPerDay(SurfArea.HODDEVIK)
             }
             Spacer(modifier = Modifier.height(16.dp))
             InfoCard()
@@ -201,7 +200,7 @@ fun HeaderCard() {
     }
 }
 @Composable
-fun DayPreviewCard(dag: String) {
+fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: String) {
     Card(
         modifier = Modifier
             .padding(6.dp)
@@ -218,7 +217,7 @@ fun DayPreviewCard(dag: String) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "$dag",
+                    text = day,
                     style = TextStyle(
                         fontSize = 9.sp,
                         fontWeight = FontWeight(400),
@@ -268,7 +267,7 @@ fun DayPreviewCard(dag: String) {
                 }
                 Column {
                     Text(
-                        text = "2m",
+                        text = surfAreaScreenUiState.waveHeights.maxByOrNull{it.second}?.second.toString(),
                         style = TextStyle(
                             fontSize = 13.sp,
                             fontWeight = FontWeight(400),
@@ -282,33 +281,11 @@ fun DayPreviewCard(dag: String) {
 }
 
 
-
-
-/*forslag
-@Composable
-fun ShowForecastNext24hrs(day: String) {
-    // vis 0-6, 6-12, 12-18, 18-24
-
-}
-
-@Composable
-fun Next24HoursCard() {
-
-}
-
-@Composable
-fun ShowForecastNext7Days() {
-    val days = listOf<String>("Monday", "Tuesday")
-    days.forEach { ShowForecastNext24hrs(day = it) }
-}
-*/
-
-
 @Preview(showBackground = true)
 @Composable
 private fun PreviewSurfAreaScreen() {
     MyApplicationTheme {
-        SurfAreaScreen()
+        SurfAreaScreen(SurfArea.HODDEVIK)
         //DayPreviewCard()
         //HeaderCard()
         //InfoCard()

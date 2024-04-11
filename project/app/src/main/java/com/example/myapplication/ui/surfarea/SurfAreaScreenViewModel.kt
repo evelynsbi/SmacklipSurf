@@ -20,6 +20,7 @@ data class SurfAreaScreenUiState(
     val windSpeeds: List<Pair<List<Int>, Double>> = emptyList(),
     val windSpeedOfGusts: List<Pair<List<Int>, Double>> = emptyList(),
     val forecast7Days: MutableList<List<Pair<List<Int>, List<Double>>>> = mutableListOf()
+
     )
 
 
@@ -28,6 +29,7 @@ class SurfAreaScreenViewModel: ViewModel() {
     private val smackLipRepository = SmackLipRepositoryImpl()
     private val _surfAreaScreenUiState = MutableStateFlow(SurfAreaScreenUiState())
     val surfAreaScreenUiState: StateFlow<SurfAreaScreenUiState> = _surfAreaScreenUiState.asStateFlow()
+
 
 
     fun updateAlerts() {
@@ -76,12 +78,14 @@ class SurfAreaScreenViewModel: ViewModel() {
     }
 
 
-    fun getForecastNext7Days(surfArea: SurfArea){
+    fun updateForecastNext7Days(surfArea: SurfArea){
         viewModelScope.launch(Dispatchers.IO) {
             _surfAreaScreenUiState.update {
                 val newForecast7Days = smackLipRepository.getDataForTheNext7Days(surfArea)
-                it.copy(forecast7Days = newForecast7Days)
-
+                it.copy(
+                    forecast7Days = newForecast7Days,
+                    waveHeights = newForecast7Days
+                )
             }
         }
     }
