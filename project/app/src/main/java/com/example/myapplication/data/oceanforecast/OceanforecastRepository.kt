@@ -20,21 +20,23 @@ class OceanforecastRepositoryImpl(
 ): OceanforecastRepository {
     //vet ikke hva som er best practice: ha datasource som argument eller ha det inni klassen
 
-    private var timeSeries : List<Pair<String, DataOF>> = emptyList()
+    private var timeSeries: List<Pair<String, DataOF>> = emptyList()
 
     override suspend fun getTimeSeries(surfArea: SurfArea): List<Pair<String, DataOF>> {
         //henter timeSeries som er en liste av TimeSerie-objekter som består av de to variablene time og data
-        val timeSeries : List<TimeserieOF> = dataSource.fetchOceanforecast(surfArea).properties.timeseries;
+        val timeSeries: List<TimeserieOF> =
+            dataSource.fetchOceanforecast(surfArea).properties.timeseries
 
         //returnerer en map som mapper time til data, dermed ser man data for hver tidspunkt
-        return timeSeries.map {it.time to it.data}
+        return timeSeries.map { it.time to it.data }
     }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getTimeSeriesDayByDay(surfArea: SurfArea): List<List<Pair<String, DataOF>>> {
         //henter timeSeries som er en liste av TimeSerie-objekter som består av de to variablene time og data
-        val timeSeries: List<TimeserieOF> = dataSource.fetchOceanforecast(surfArea).properties.timeseries
+        val timeSeries: List<TimeserieOF> =
+            dataSource.fetchOceanforecast(surfArea).properties.timeseries
 
         // grupperer dag for dag
         val groupedData = timeSeries.groupBy { LocalDate.parse(it.time).dayOfWeek }
@@ -51,26 +53,15 @@ class OceanforecastRepositoryImpl(
     }
 
 
-
-
-
-
     private fun findWaveHeightFromData(dataOF: DataOF): Double {
         return dataOF.instant.details.sea_surface_wave_height
     }
 
 
     override suspend fun getWaveHeights(surfArea: SurfArea): List<Pair<String, Double>> {
-        // Hent alle timeSeries for alle surfArea-områder
-        val allTimeSeries = SurfArea.entries.associateWith { getTimeSeries(it) }
         // Hent timeSeries for det spesifikke surfArea-området
-        val timeSeriesForArea = allTimeSeries[surfArea]
+        val timeSeriesForArea = getTimeSeries(surfArea)
         // Map og konverter timeSeries-dataene til bølgehøyder
-        return timeSeriesForArea?.map { it.first to findWaveHeightFromData(it.second) } ?: emptyList()
-
+        return timeSeriesForArea.map { it.first to findWaveHeightFromData(it.second) }
     }
-
-
-
-
 }
