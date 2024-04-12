@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.surfarea
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +48,9 @@ import com.example.myapplication.ui.theme.SchemesSurface
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurfAreaScreen(surfArea: SurfArea, surfAreaScreenViewModel: SurfAreaScreenViewModel = viewModel()) {
+    surfAreaScreenViewModel.updateForecastNext7Days(surfArea)
     val surfAreaScreenUiState: SurfAreaScreenUiState by surfAreaScreenViewModel.surfAreaScreenUiState.collectAsState()
+    Log.d("SASCREEN", "Creating screen with state $surfAreaScreenUiState")
     Scaffold {
         Column(
             modifier = Modifier
@@ -63,9 +66,7 @@ fun SurfAreaScreen(surfArea: SurfArea, surfAreaScreenViewModel: SurfAreaScreenVi
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                  items(7) { index ->
-                      surfAreaScreenViewModel.updateForecastNext7Days(surfArea)
-                      surfAreaScreenViewModel.updateMaxWaveHeights()
+                items(7) { index ->
                       DayPreviewCard(surfAreaScreenUiState, index)
                 }
             }
@@ -194,10 +195,7 @@ fun HeaderCard() {
                         .height(126.dp)
                 )
             }
-
-
         }
-
     }
 }
 @Composable
@@ -277,7 +275,6 @@ fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: Int) {
                 }
                 Column {
                     Text(
-
                         text = surfAreaScreenUiState.maxWaveHeights[day].toString(),
                         style = TextStyle(
                             fontSize = 13.sp,

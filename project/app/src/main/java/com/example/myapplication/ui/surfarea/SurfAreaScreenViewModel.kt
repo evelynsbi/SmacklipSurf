@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.surfarea
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
@@ -32,7 +33,8 @@ class SurfAreaScreenViewModel: ViewModel() {
     private val _surfAreaScreenUiState = MutableStateFlow(SurfAreaScreenUiState())
     val surfAreaScreenUiState: StateFlow<SurfAreaScreenUiState> = _surfAreaScreenUiState.asStateFlow()
 
-
+    init {
+    }
 
     fun updateAlerts() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -90,17 +92,32 @@ class SurfAreaScreenViewModel: ViewModel() {
             }
         }
     }
+
     fun updateForecastNext7Days(surfArea: SurfArea){
         viewModelScope.launch(Dispatchers.IO) {
             _surfAreaScreenUiState.update {state ->
                 val newForecast7Days = smackLipRepository.getDataForTheNext7Days(surfArea)
+                Log.d("SAVM", "Updating forcast of vm by dat containing ${newForecast7Days.size} elements")
+                val newWaveHeights = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[0]}}
+                val newMaxWaveHeights = newWaveHeights.map {day -> day.maxBy {hour -> hour.second}}.map {it.second}
+                val newWindDirections = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[1]}}
+                val newWindSpeeds = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[2]}}
+                val newWindSpeedOfGusts = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[3]}}
+
+
+                assert(newForecast7Days.isNotEmpty())
+                Log.d("SAVM", "Updating waveheight with ${newMaxWaveHeights.size} elements")
+                Log.d("SAVM", "Updating maxwaveheight with ${newMaxWaveHeights.size} elements")
+                Log.d("SAVM", "Updating winddir with ${newMaxWaveHeights.size} elements")
+                Log.d("SAVM", "Updating windspeed with ${newMaxWaveHeights.size} elements")
+                Log.d("SAVM", "Updating windgust with ${newMaxWaveHeights.size} elements")
                 state.copy(
                     forecast7Days = newForecast7Days,
-                    waveHeights = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[0]}},
-                    maxWaveHeights = state.waveHeights.map {day -> day.maxBy {hour -> hour.second}}.map {it.second},
-                    windDirections = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[1]}},
-                    windSpeeds = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[2]}},
-                    windSpeedOfGusts = newForecast7Days.map { dayForecast ->  dayForecast.map { dayData -> dayData.first to dayData.second[3]}},
+                    waveHeights = newWaveHeights,
+                    maxWaveHeights = newMaxWaveHeights,
+                    windDirections = newWindDirections,
+                    windSpeeds = newWindSpeeds,
+                    windSpeedOfGusts = newWindSpeedOfGusts
                 )
             }
         }
