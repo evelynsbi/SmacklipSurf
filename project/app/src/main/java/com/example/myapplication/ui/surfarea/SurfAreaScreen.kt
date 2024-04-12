@@ -48,8 +48,9 @@ import com.example.myapplication.ui.theme.SchemesSurface
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurfAreaScreen(surfArea: SurfArea, surfAreaScreenViewModel: SurfAreaScreenViewModel = viewModel()) {
-    surfAreaScreenViewModel.updateForecastNext7Days(surfArea)
     val surfAreaScreenUiState: SurfAreaScreenUiState by surfAreaScreenViewModel.surfAreaScreenUiState.collectAsState()
+    surfAreaScreenViewModel.updateForecastNext7Days(surfArea)
+
     Log.d("SASCREEN", "Creating screen with state $surfAreaScreenUiState")
     Scaffold {
         Column(
@@ -275,7 +276,7 @@ fun DayPreviewCard(surfAreaScreenUiState: SurfAreaScreenUiState, day: Int) {
                 }
                 Column {
                     Text(
-                        text = surfAreaScreenUiState.maxWaveHeights[day].toString(),
+                        text = if (surfAreaScreenUiState.maxWaveHeights.isNotEmpty()) "${surfAreaScreenUiState.maxWaveHeights[day]}m" else "",
                         style = TextStyle(
                             fontSize = 13.sp,
                             fontWeight = FontWeight(400),
