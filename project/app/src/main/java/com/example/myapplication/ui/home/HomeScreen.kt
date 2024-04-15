@@ -154,20 +154,38 @@ fun FavoritesList(
             items(favorites) { surfArea ->
                 Card(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .size(width = 135.89417.dp, height = 251.48856.dp)
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                        .size(width = 125.89417.dp, height = 251.48856.dp)
                         .clip(RoundedCornerShape(10.dp))
                 ) {
                     SurfAreaCard(
                         surfArea = surfArea,
-                        windSpeedMap = emptyMap(),
-                        windGustMap = emptyMap(),
+                        windSpeedMap = windSpeedMap,
+                        windGustMap = windGustMap,
                         windDirectionMap = emptyMap(),
-                        waveHeightMap = emptyMap(),
-                        alerts = emptyList(),
+                        waveHeightMap = waveHeightMap,
+                        alerts = alerts,
                         homeScreenViewModel = HomeScreenViewModel(),
                         showFavoriteButton = false
                     )
+                    if (alerts != null && alerts.isNotEmpty()) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon_awareness_yellow_outlined),
+                            contentDescription = "warning icon",
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(24.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon_awareness_yellow_outlined),
+                            contentDescription = "warning icon",
+                            modifier = Modifier
+                                .padding(8.dp))
+
+
+                    }
+
                 }
             }
         }
@@ -182,8 +200,8 @@ fun EmptyFavoriteCard() {
         modifier =
         Modifier
             //.border(width = 0.80835.dp, color = Color(0xFFBEC8CA), shape = RoundedCornerShape(size = 6.70023.dp ))
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .size(width = 105.89417.dp, height = 251.48856.dp)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .size(width = 125.89417.dp, height = 251.48856.dp)
             .background(color = Color(0xFFF5FAFB))
             .clip(RoundedCornerShape(10.dp))
 

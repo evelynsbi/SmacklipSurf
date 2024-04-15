@@ -13,10 +13,10 @@ enum class SurfArea(
 
     //Stadt
     HODDEVIK("Hoddevik, Stadt",62.723, 5.103, R.drawable.cover___hoddevik, ),
-    ERVIKA("Ervika, Stadt", 62.166674, 5.115609, 0),
+    ERVIKA("Ervika, Stadt", 62.166674, 5.115609, R.drawable.cover__ervika),
 
     //Lofoten
-    SKAGSANDEN("Skagsanden, Flakstad", 68.107052, 13.295348, 0),
+    SKAGSANDEN("Skagsanden, Flakstad", 68.107052, 13.295348, R.drawable.cover__skagsanden),
     UNSTAD("Unstad, Lofoten", 68.268527, 13.580834, R.drawable.cover__unstad),
     GIMSTAD("Gimstad, ", 68.637591, 14.427877, 0),
     SANDVIKBUKTA("Sandvikbukta", 68.757964, 14.470910, 0),
