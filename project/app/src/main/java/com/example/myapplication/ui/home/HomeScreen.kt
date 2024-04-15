@@ -1,16 +1,24 @@
 package com.example.myapplication.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -30,6 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,12 +81,13 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
                 waveHeightMap = homeScreenUiState.waveHeight,
                 alerts = homeScreenUiState.allRelevantAlerts
             )
-            LazyColumn(
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+                horizontalArrangement = Arrangement.Center)
+            {
                 items(SurfArea.entries) { location ->
                     SurfAreaCard(
                         location,
@@ -107,12 +119,15 @@ fun FavoritesList(
     alerts: List<List<Features>>?
 ) {
     Column {
+
         Text(
             text = "Favoritter",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            color = Color.DarkGray
+            style = TextStyle(
+                fontSize = 13.sp,
+                //fontFamily = FontFamily(Font(R.font.inter))
+                fontWeight = FontWeight(400),
+                color = Color(0xFF9A938C)
+            )
         )
     }
     if (favorites.isNotEmpty()) {
@@ -121,7 +136,7 @@ fun FavoritesList(
                 Card(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .size(width = 150.dp, height = 250.dp)
+                        .size(width = 105.89417.dp, height = 221.48856.dp)
                         .clip(RoundedCornerShape(10.dp))
                 ) {
                     SurfAreaCard(
@@ -144,10 +159,14 @@ fun FavoritesList(
 @Composable
 fun EmptyFavoriteCard() {
     Card(
-        modifier = Modifier
+        modifier =
+        Modifier
+            //.border(width = 0.80835.dp, color = Color(0xFFBEC8CA), shape = RoundedCornerShape(size = 6.70023.dp ))
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .size(width = 150.dp, height = 250.dp)
+            .size(width = 105.89417.dp, height = 221.48856.dp)
+            .background(color = Color(0xFFF5FAFB))
             .clip(RoundedCornerShape(10.dp))
+
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -180,30 +199,33 @@ fun SurfAreaCard(
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+            .width(162.dp)
+            .height(162.dp)
+            .padding(4.dp)
     ) {
+
         Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+            //horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+
+            //verticalAlignment = Alignment.CenterVertically,
             //contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
+        )
+        {
             if (showFavoriteButton) {
-                Column(
+                IconButton(
+                    onClick = { homeScreenViewModel.updateFavorites(surfArea) },
                     modifier = Modifier
-                        .padding(2.dp)
-                        .align(Alignment.Top),
-                    horizontalAlignment = Alignment.End,
-                ) {
-                    IconButton(
-                        onClick = { homeScreenViewModel.updateFavorites(surfArea) },
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = homeScreenViewModel.updateFavoritesIcon(surfArea)),
-                            contentDescription = "Toggle favorite",
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
+                        .align(Alignment.Top)
+                        .padding(end = 8.dp, top = 8.dp)
+                ){
+                    Icon(
+                        painter = painterResource(id = homeScreenViewModel.updateFavoritesIcon(surfArea)),
+                        contentDescription = "Toggle favorite",
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
             Column(
@@ -211,8 +233,11 @@ fun SurfAreaCard(
                     .fillMaxHeight()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.Start,
-            ) {
+            )
+            {
+
                 Row {
+
                     Text(
                         text = surfArea.locationName,
                         fontWeight = FontWeight.Bold
