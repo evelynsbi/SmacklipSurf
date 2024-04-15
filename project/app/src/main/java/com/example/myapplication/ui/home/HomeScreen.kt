@@ -3,10 +3,12 @@ package com.example.myapplication.ui.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +23,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +38,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +61,7 @@ import com.example.myapplication.model.metalerts.Features
 import com.example.myapplication.model.metalerts.Properties
 import com.example.myapplication.model.surfareas.SurfArea
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.mapbox.maps.extension.style.expressions.dsl.generated.e
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -194,6 +203,7 @@ fun SurfAreaCard(
     homeScreenViewModel: HomeScreenViewModel,
     showFavoriteButton: Boolean = true
 ) {
+
     val windSpeed = windSpeedMap[surfArea] ?: listOf()
     val windGust = windGustMap[surfArea] ?: listOf()
     val waveHeight = waveHeightMap[surfArea] ?: listOf()
@@ -202,25 +212,20 @@ fun SurfAreaCard(
         modifier = Modifier
             .width(162.dp)
             .height(162.dp)
-            .padding(4.dp)
+            .padding(start = 5.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
     ) {
 
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-            //horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-            //verticalAlignment = Alignment.CenterVertically,
-            //contentAlignment = Alignment.Center,
-        )
-        {
+            // Stjerneikon
             if (showFavoriteButton) {
                 IconButton(
                     onClick = { homeScreenViewModel.updateFavorites(surfArea) },
                     modifier = Modifier
-                        .align(Alignment.Top)
-                        .padding(end = 8.dp, top = 8.dp)
+                        .align(Alignment.TopEnd)
+                        .padding(end = 0.dp, top = 0.dp)
                 ){
                     Icon(
                         painter = painterResource(id = homeScreenViewModel.updateFavoritesIcon(surfArea)),
@@ -229,6 +234,7 @@ fun SurfAreaCard(
                     )
                 }
             }
+
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -241,28 +247,57 @@ fun SurfAreaCard(
 
                     Text(
                         text = surfArea.locationName,
-                        fontWeight = FontWeight.Bold
+                        style = TextStyle(
+                            fontSize = 12.93.sp,
+                            lineHeight = 19.4.sp,
+                            fontWeight = FontWeight(700),
+                            letterSpacing = 0.12.sp
+
+                        )
+
                     )
                 }
                 Row {
+                    Image(
+                        painter = painterResource(id = R.drawable.tsunami),
+                        contentDescription = "wave icon",
+                        modifier = Modifier
+                            .padding(0.02021.dp)
+                            .width(15.3587.dp)
+                            .height(14.47855.dp)
+
+                    )
+
                     Text(
-                        text = "Wind: ${if (windSpeed.isNotEmpty()) windSpeed[0].second else ""}" +
+                        text = " ${if (waveHeight.isNotEmpty()) waveHeight[0].second else ""}"
+                    )
+                }
+
+                Row {
+                    Image(
+                        painter = painterResource(id = R.drawable.air),
+                        contentDescription = "Air icon",
+                        modifier = Modifier
+                            .padding(0.02021.dp)
+                            .width(15.3587.dp)
+                            .height(13.6348.dp)
+                    )
+                    Text(
+                        text = " ${if (windSpeed.isNotEmpty()) windSpeed[0].second else ""}" +
                                 if(windGust.isNotEmpty() && windSpeed.isNotEmpty() && windGust[0].second != windSpeed[0].second) "(${windGust[0].second})" else ""
                     )
                 }
 
-                Row {
-                    Text(
-                        text = "Wave height: ${if (waveHeight.isNotEmpty()) waveHeight[0].second else ""}"
-                    )
-                }
 
+
+                /*
                 Row {
                     Text(
                         // only shows description of first alert. There may be several.
                         text = "Alert:  ${if (alerts?.isNotEmpty() == true) alerts[0][0].properties?.description else ""}"
                     )
                 }
+
                 Row {
                     if (alerts?.isNotEmpty() == true) {
                         val icon =
@@ -280,6 +315,8 @@ fun SurfAreaCard(
                         )
                     }
                 }
+
+                 */
                 Column(
                     horizontalAlignment = Alignment.End
                 ) {

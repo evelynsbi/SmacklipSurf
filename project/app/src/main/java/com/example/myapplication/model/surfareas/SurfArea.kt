@@ -17,12 +17,12 @@ enum class SurfArea(
 
     //Lofoten
     SKAGSANDEN("Skagsanden, Flakstad", 68.107052, 13.295348, 0),
-    UNSTAD("Unstad, Lofoten", 68.268527, 13.580834, 0),
+    UNSTAD("Unstad, Lofoten", 68.268527, 13.580834, R.drawable.cover__unstad),
     GIMSTAD("Gimstad, ", 68.637591, 14.427877, 0),
     SANDVIKBUKTA("Sandvikbukta", 68.757964, 14.470910, 0),
 
     //Sør-vest
-    JAEREN("Hellestø,Jæren", 58.800230, 5.548844, 0),
+    JAEREN("Hellestø,Jæren", 58.800230, 5.548844, R.drawable.cover__jeren),
     KARMOEY("Karmøy (Stavasanden)", 59.233526, 5.183540, 0),
 
     //Østlandet
