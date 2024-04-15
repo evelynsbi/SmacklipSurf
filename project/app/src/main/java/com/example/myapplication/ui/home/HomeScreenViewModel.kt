@@ -1,11 +1,11 @@
 package com.example.myapplication.ui.home
-import android.util.Log
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
-import com.example.myapplication.model.surfareas.SurfArea
 import com.example.myapplication.model.metalerts.Features
+import com.example.myapplication.model.surfareas.SurfArea
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +25,9 @@ data class HomeScreenUiState(
 class HomeScreenViewModel : ViewModel() {
     private val smackLipRepository = SmackLipRepositoryImpl()
     private val _homeScreenUiState = MutableStateFlow(HomeScreenUiState())
+    private val _favoriteSurfAreas = MutableStateFlow<List<SurfArea>>(emptyList())
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
+    val favoriteSurfAreas: StateFlow<List<SurfArea>> = _favoriteSurfAreas
 
     init {
         updateWindSpeed()
@@ -108,6 +110,19 @@ class HomeScreenViewModel : ViewModel() {
         }
     }
 
+    fun updateFavorites(surfArea: SurfArea) {
+        if (_favoriteSurfAreas.value.contains(surfArea)) {
+            _favoriteSurfAreas.value -= surfArea
+        } else {
+            _favoriteSurfAreas.value += surfArea
+        }
+    }
+
+    fun updateFavoritesIcon(surfArea: SurfArea): Int {
+        return if (_favoriteSurfAreas.value.contains(surfArea)) {
+            R.drawable.yellow_star_icon
+        } else {
+            R.drawable.empty_star_icon
+        }
+    }
 }
-
-

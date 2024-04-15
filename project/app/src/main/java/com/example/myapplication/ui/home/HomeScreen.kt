@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,10 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,22 +27,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
-import com.example.myapplication.model.surfareas.SurfArea
 import com.example.myapplication.model.metalerts.Features
 import com.example.myapplication.model.metalerts.Properties
+import com.example.myapplication.model.surfareas.SurfArea
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
-
-    val homeScreenUiState : HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
+    val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
+    val homeScreenUiState: HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -50,30 +59,110 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
                     Text(text = "Locations")
                 })
         }) { innerPadding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(SurfArea.entries) { location ->
-                SurfAreaCard(
-                    location,
-                    windSpeedMap = homeScreenUiState.windSpeed,
-                    windGustMap = homeScreenUiState.windGust,
-                    waveHeightMap = homeScreenUiState.waveHeight,
-                    alerts = homeScreenUiState.allRelevantAlerts.filter {alert ->
-                        alert.any{ it.properties?.area?.contains(location.locationName) ?: false}
-
-                    },
-                    homeScreenViewModel = homeScreenViewModel
-                )
+            FavoritesList(
+                favorites = favoriteSurfAreas,
+                windSpeedMap = homeScreenUiState.windSpeed,
+                windGustMap = homeScreenUiState.windGust,
+                waveHeightMap = homeScreenUiState.waveHeight,
+                alerts = homeScreenUiState.allRelevantAlerts
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(SurfArea.entries) { location ->
+                    SurfAreaCard(
+                        location,
+                        windSpeedMap = homeScreenUiState.windSpeed,
+                        windGustMap = homeScreenUiState.windGust,
+                        waveHeightMap = homeScreenUiState.waveHeight,
+                        alerts = homeScreenUiState.allRelevantAlerts.filter { alert ->
+                            alert.any {
+                                it.properties?.area?.contains(location.locationName) ?: false }
+                        },
+                        homeScreenViewModel = homeScreenViewModel
+                    )
+                }
             }
         }
     }
 }
 
+/* TODO:
+implement windspeedmap, windgustmap, waveheightmap and alerts correctly,
+to receive accurate values in favorite surfareacards
+ */
+@Composable
+fun FavoritesList(
+    favorites: List<SurfArea>,
+    windSpeedMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
+    windGustMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
+    waveHeightMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
+    alerts: List<List<Features>>?
+) {
+    Column {
+        Text(
+            text = "Favoritter",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            color = Color.DarkGray
+        )
+    }
+    if (favorites.isNotEmpty()) {
+        LazyRow {
+            items(favorites) { surfArea ->
+                Card(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .size(width = 150.dp, height = 250.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
+                    SurfAreaCard(
+                        surfArea = surfArea,
+                        windSpeedMap = emptyMap(),
+                        windGustMap = emptyMap(),
+                        waveHeightMap = emptyMap(),
+                        alerts = emptyList(),
+                        homeScreenViewModel = HomeScreenViewModel(),
+                        showFavoriteButton = false
+                    )
+                }
+            }
+        }
+    } else {
+        EmptyFavoriteCard()
+    }
+}
 
+@Composable
+fun EmptyFavoriteCard() {
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .size(width = 150.dp, height = 250.dp)
+            .clip(RoundedCornerShape(10.dp))
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Ingen favoritter lagt til",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                color = Color.Gray,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+}
 
 @Composable
 fun SurfAreaCard(
@@ -82,23 +171,41 @@ fun SurfAreaCard(
     windGustMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     waveHeightMap: Map<SurfArea,List<Pair<List<Int>, Double>>>,
     alerts: List<List<Features>>?,
-    homeScreenViewModel: HomeScreenViewModel
+    homeScreenViewModel: HomeScreenViewModel,
+    showFavoriteButton: Boolean = true
 ) {
     val windSpeed = windSpeedMap[surfArea] ?: listOf()
     val windGust = windGustMap[surfArea] ?: listOf()
     val waveHeight = waveHeightMap[surfArea] ?: listOf()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-
         Row(
             //contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-
-
+            if (showFavoriteButton) {
+                Column(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .align(Alignment.Top),
+                    horizontalAlignment = Alignment.End,
+                ) {
+                    IconButton(
+                        onClick = { homeScreenViewModel.updateFavorites(surfArea) },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = homeScreenViewModel.updateFavoritesIcon(surfArea)),
+                            contentDescription = "Toggle favorite",
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -131,7 +238,6 @@ fun SurfAreaCard(
                     )
                 }
                 Row {
-
                     if (alerts?.isNotEmpty() == true) {
                         val icon =
                             homeScreenViewModel.getIconBasedOnAwarenessLevel(alerts[0][0].properties?.awarenessLevel.toString())
@@ -163,6 +269,7 @@ fun SurfAreaCard(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun PreviewSurfAreaCard() {
@@ -182,7 +289,9 @@ private fun PreviewSurfAreaCard() {
             windSpeedMap,
             windGustMap,
             waveHeightMap,
-            listOf(listOf((Features(properties = Properties(description = "Det ræinar"))))), viewModel
+            listOf(listOf((Features(properties = Properties(description = "Det ræinar"))))),
+            viewModel,
+            true
         )
     }
 }
@@ -194,5 +303,3 @@ private fun PreviewHomeScreen() {
         HomeScreen()
     }
 }
-
-
