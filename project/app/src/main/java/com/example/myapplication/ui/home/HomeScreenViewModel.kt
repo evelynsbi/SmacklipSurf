@@ -17,7 +17,7 @@ data class HomeScreenUiState(
     val locationName: String = "",
     val windSpeed: Map<SurfArea, List<Pair<List<Int>, Double>>> = emptyMap(),
     val windGust: Map<SurfArea, List<Pair<List<Int>, Double>>> = emptyMap(),
-    val windDirection: List<Pair<String, Double>> = emptyList(),
+    val windDirection: Map<SurfArea,List<Pair<List<Int>, Double>>> = emptyMap(),
     val waveHeight: Map<SurfArea, List<Pair<List<Int>, Double>>> = emptyMap(),
     val allRelevantAlerts: List<List<Features>> = emptyList()
 )
@@ -32,6 +32,7 @@ class HomeScreenViewModel : ViewModel() {
     init {
         updateWindSpeed()
         updateWindGust()
+        updateWindDirection()
         updateWaveHeight()
         updateAlerts()
 
@@ -59,6 +60,18 @@ class HomeScreenViewModel : ViewModel() {
             }
             _homeScreenUiState.update {
                 it.copy(windGust = updatedWindGust)
+            }
+        }
+    }
+    fun updateWindDirection() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val updatedWindDirection: MutableMap<SurfArea, List<Pair<List<Int>, Double>>> = mutableMapOf()
+            SurfArea.entries.forEach {surfArea ->
+                val newWindDirection = smackLipRepository.getWindDirection(surfArea)
+                updatedWindDirection[surfArea] = newWindDirection
+            }
+            _homeScreenUiState.update {
+                it.copy(windDirection = updatedWindDirection)
             }
         }
     }

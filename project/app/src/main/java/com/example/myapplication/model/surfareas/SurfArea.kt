@@ -12,7 +12,7 @@ enum class SurfArea(
     //surf areas
 
     //Stadt
-    HODDEVIK("Hoddevik, Stadt",62.723, 5.103, R.drawable.cover___hoddevik),
+    HODDEVIK("Hoddevik, Stadt",62.723, 5.103, R.drawable.cover___hoddevik, ),
     ERVIKA("Ervika, Stadt", 62.166674, 5.115609, 0),
 
     //Lofoten

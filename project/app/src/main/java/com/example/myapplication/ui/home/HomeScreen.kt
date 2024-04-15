@@ -16,14 +16,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
@@ -44,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -83,19 +88,21 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                    //.verticalScroll(rememberScrollState())
         ) {
             FavoritesList(
                 favorites = favoriteSurfAreas,
                 windSpeedMap = homeScreenUiState.windSpeed,
                 windGustMap = homeScreenUiState.windGust,
+                windDirectionMap = homeScreenUiState.windDirection,
                 waveHeightMap = homeScreenUiState.waveHeight,
                 alerts = homeScreenUiState.allRelevantAlerts
             )
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.Center)
             {
                 items(SurfArea.entries) { location ->
@@ -103,6 +110,7 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
                         location,
                         windSpeedMap = homeScreenUiState.windSpeed,
                         windGustMap = homeScreenUiState.windGust,
+                        windDirectionMap = homeScreenUiState.windDirection,
                         waveHeightMap = homeScreenUiState.waveHeight,
                         alerts = homeScreenUiState.allRelevantAlerts.filter { alert ->
                             alert.any {
@@ -125,6 +133,7 @@ fun FavoritesList(
     favorites: List<SurfArea>,
     windSpeedMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     windGustMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
+    windDirectionMap:Map<SurfArea, List<Pair<List<Int>, Double>>>,
     waveHeightMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     alerts: List<List<Features>>?
 ) {
@@ -146,13 +155,14 @@ fun FavoritesList(
                 Card(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .size(width = 105.89417.dp, height = 221.48856.dp)
+                        .size(width = 135.89417.dp, height = 251.48856.dp)
                         .clip(RoundedCornerShape(10.dp))
                 ) {
                     SurfAreaCard(
                         surfArea = surfArea,
                         windSpeedMap = emptyMap(),
                         windGustMap = emptyMap(),
+                        windDirectionMap = emptyMap(),
                         waveHeightMap = emptyMap(),
                         alerts = emptyList(),
                         homeScreenViewModel = HomeScreenViewModel(),
@@ -173,7 +183,7 @@ fun EmptyFavoriteCard() {
         Modifier
             //.border(width = 0.80835.dp, color = Color(0xFFBEC8CA), shape = RoundedCornerShape(size = 6.70023.dp ))
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .size(width = 105.89417.dp, height = 221.48856.dp)
+            .size(width = 105.89417.dp, height = 251.48856.dp)
             .background(color = Color(0xFFF5FAFB))
             .clip(RoundedCornerShape(10.dp))
 
@@ -198,6 +208,7 @@ fun SurfAreaCard(
     surfArea: SurfArea,
     windSpeedMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     windGustMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
+    windDirectionMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     waveHeightMap: Map<SurfArea,List<Pair<List<Int>, Double>>>,
     alerts: List<List<Features>>?,
     homeScreenViewModel: HomeScreenViewModel,
@@ -206,17 +217,21 @@ fun SurfAreaCard(
 
     val windSpeed = windSpeedMap[surfArea] ?: listOf()
     val windGust = windGustMap[surfArea] ?: listOf()
+    val windDirection = windDirectionMap[surfArea] ?: listOf()
     val waveHeight = waveHeightMap[surfArea] ?: listOf()
 
     Card(
         modifier = Modifier
-            .width(162.dp)
-            .height(162.dp)
+            .wrapContentSize()
             .padding(start = 5.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
     ) {
 
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .width(162.dp)
+                .height(162.dp)
+
         ) {
 
             // Stjerneikon
@@ -269,8 +284,9 @@ fun SurfAreaCard(
                     )
 
                     Text(
-                        text = " ${if (waveHeight.isNotEmpty()) waveHeight[0].second else ""}"
+                        text = " ${if (waveHeight.isNotEmpty()) "${waveHeight[0].second}m" else ""}"
                     )
+
                 }
 
                 Row {
@@ -286,6 +302,21 @@ fun SurfAreaCard(
                         text = " ${if (windSpeed.isNotEmpty()) windSpeed[0].second else ""}" +
                                 if(windGust.isNotEmpty() && windSpeed.isNotEmpty() && windGust[0].second != windSpeed[0].second) "(${windGust[0].second})" else ""
                     )
+                    Text(
+                        text = " ${if (windDirection.isNotEmpty()) "${windDirection[0].second}°" else ""}"
+                    )
+
+
+
+                    /*Image(
+                        painter = painterResource(id = R.drawable.arrow),
+                        contentDescription = "arrow icon",
+                        modifier = Modifier
+
+
+                    )
+
+                     */
                 }
 
 
@@ -326,8 +357,9 @@ fun SurfAreaCard(
                             contentDescription = "SurfArea Image",
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
-                                .width(134.dp)
-                                .height(67.dp)
+                                .width(162.dp)
+                                .height(100.dp)
+                                .clip(RoundedCornerShape(8.dp))
 
 
                         )
@@ -346,6 +378,10 @@ private fun PreviewSurfAreaCard() {
     )
     val windGustMap: Map<SurfArea,List<Pair<List<Int>, Double>>> = mapOf(
         SurfArea.HODDEVIK to listOf(Pair(listOf(3, 5, 8, 32), 3.0))
+
+    )
+    val windDirectionMap: Map<SurfArea,List<Pair<List<Int>, Double>>> = mapOf(
+        SurfArea.HODDEVIK to listOf(Pair(listOf(3, 5, 8, 32), 184.3))
     )
     val waveHeightMap: Map<SurfArea,List<Pair<List<Int>, Double>>> = mapOf(
         SurfArea.HODDEVIK to listOf(Pair(listOf(1, 2, 3, 4), 5.0))
@@ -356,6 +392,7 @@ private fun PreviewSurfAreaCard() {
             SurfArea.HODDEVIK,
             windSpeedMap,
             windGustMap,
+            windDirectionMap,
             waveHeightMap,
             listOf(listOf((Features(properties = Properties(description = "Det ræinar"))))),
             viewModel,
