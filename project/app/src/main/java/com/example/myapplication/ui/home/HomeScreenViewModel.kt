@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.home
 
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
@@ -10,6 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,8 +28,10 @@ data class HomeScreenUiState(
 class HomeScreenViewModel : ViewModel() {
     private val smackLipRepository = SmackLipRepositoryImpl()
     private val _homeScreenUiState = MutableStateFlow(HomeScreenUiState())
+    private val _searchQuery = MutableStateFlow("")
     private val _favoriteSurfAreas = MutableStateFlow<List<SurfArea>>(emptyList())
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
+    val searchQuery = _searchQuery.asStateFlow()
     val favoriteSurfAreas: StateFlow<List<SurfArea>> = _favoriteSurfAreas
 
     init {
@@ -122,6 +127,24 @@ class HomeScreenViewModel : ViewModel() {
             R.drawable.icon_awareness_default
         }
     }
+
+    /* val searchResults: StateFlow<List<SurfArea>> =
+        snapshotFlow { searchQuery }
+            .combine(flowOf(listOf(SurfArea.entries))) { searchQuery, surfAreas ->
+                when {
+                    searchQuery.isNotEmpty() -> surfAreas.filter { surfArea ->
+                        surfArea.locationName.contains(searchQuery, ignoreCase = true)
+                    }
+                    else -> surfAreas
+                }
+            }.stateIn(
+                scope = viewModelScope,
+                initialValue = emptyList()
+            )
+
+    fun onSearchQueryChange(newQuery: String) {
+        searchQuery = newQuery
+    } */
 
     fun updateFavorites(surfArea: SurfArea) {
         if (_favoriteSurfAreas.value.contains(surfArea)) {

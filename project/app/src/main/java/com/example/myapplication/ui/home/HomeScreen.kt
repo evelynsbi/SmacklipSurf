@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,8 +31,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,6 +62,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -72,23 +78,25 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.e
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
-    val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
     val homeScreenUiState: HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
-    var searchText by remember { mutableStateOf("") }
+    val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
+
+    val isSearchActive = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text(text = "Locations")
-                })
+            Column {
+                SearchBar(
+                    onQueryChange = {},
+                    isSearchActive = isSearchActive.value,
+                    onActiveChanged = { isActive ->
+                        isSearchActive.value = isActive
+                    },
+                    surfAreas = SurfArea.entries.toList()
+                )
+            }
         }
-
-        ) { innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -136,6 +144,87 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SearchBar(
+    onQueryChange: (String) -> Unit,
+    isSearchActive: Boolean,
+    onActiveChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    onSearch: ((String) -> Unit)? = null,
+    surfAreas: List<SurfArea>
+) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val activeChanged: (Boolean) -> Unit = { active ->
+        if (!active) {
+            searchQuery = ""
+            onQueryChange("")
+        }
+        onActiveChanged(active)
+    }
+
+    TextField(
+        value = searchQuery,
+        onValueChange = { query ->
+            searchQuery = query
+            onQueryChange(query)
+            activeChanged(true)
+        },
+        modifier = modifier
+            .padding(start = 12.dp, top = 2.dp, end = 12.dp, bottom = 12.dp)
+            .fillMaxWidth(),
+        placeholder = { Text("Søk etter surfeområde") },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Rounded.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        trailingIcon = {
+            if(isSearchActive) {
+                IconButton(
+                    onClick = {
+                        searchQuery = ""
+                        onQueryChange("")
+                        onActiveChanged(false)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "Clear searchbar"
+                    )
+                }
+            }
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Search
+        ),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onSearch?.invoke(searchQuery)
+                activeChanged(false)
+            }
+        )
+    )
+    if (searchQuery.isNotEmpty()) {
+        val filteredSurfAreas = surfAreas.filter { it.locationName.contains(searchQuery, ignoreCase = true) }
+        if (filteredSurfAreas.isNotEmpty()) {
+            LazyColumn {
+                items(filteredSurfAreas) {surfArea ->
+                    Text(
+                        text = surfArea.locationName,
+                        modifier = Modifier.clickable { onSearch?.invoke(surfArea.locationName) }
+                    )
+                }
+            }
+        } else {
+            Text("Ingen samsvarende surfeområder funnet")
         }
     }
 }
