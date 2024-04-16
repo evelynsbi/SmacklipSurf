@@ -303,6 +303,8 @@ fun EmptyFavoriteCard() {
     Card(
         modifier =
         Modifier
+            .wrapContentSize()
+            .padding(start =8.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
             //.border(width = 0.80835.dp, color = Color(0xFFBEC8CA), shape = RoundedCornerShape(size = 6.70023.dp ))
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .size(width = 135.89417.dp, height = 251.48856.dp)
@@ -347,7 +349,7 @@ fun SurfAreaCard(
     Card(
         modifier = Modifier
             .wrapContentSize()
-            .padding(start = 5.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
+            .padding(start =   8.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
     ) {
 
         Box(
@@ -369,7 +371,7 @@ fun SurfAreaCard(
                     Icon(
                         painter = painterResource(id = homeScreenViewModel.updateFavoritesIcon(surfArea)),
                         contentDescription = "Toggle favorite",
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
