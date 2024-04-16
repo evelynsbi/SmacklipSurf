@@ -38,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -73,6 +74,7 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.e
 fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
     val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
     val homeScreenUiState: HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
+    var searchText by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -84,7 +86,9 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
                 title = {
                     Text(text = "Locations")
                 })
-        }) { innerPadding ->
+        }
+
+        ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -98,6 +102,18 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel()) {
                 waveHeightMap = homeScreenUiState.waveHeight,
                 alerts = homeScreenUiState.allRelevantAlerts
             )
+            Column {
+
+                Text(
+                    text = "Alle lokasjoner",
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        //fontFamily = FontFamily(Font(R.font.inter))
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF9A938C)
+                    )
+                )
+            }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
@@ -155,7 +171,7 @@ fun FavoritesList(
                 Card(
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 8.dp)
-                        .size(width = 125.89417.dp, height = 251.48856.dp)
+                        .size(width = 135.89417.dp, height = 251.48856.dp)
                         .clip(RoundedCornerShape(10.dp))
                 ) {
                     SurfAreaCard(
@@ -201,7 +217,7 @@ fun EmptyFavoriteCard() {
         Modifier
             //.border(width = 0.80835.dp, color = Color(0xFFBEC8CA), shape = RoundedCornerShape(size = 6.70023.dp ))
             .padding(horizontal = 8.dp, vertical = 8.dp)
-            .size(width = 125.89417.dp, height = 251.48856.dp)
+            .size(width = 135.89417.dp, height = 251.48856.dp)
             .background(color = Color(0xFFF5FAFB))
             .clip(RoundedCornerShape(10.dp))
 
@@ -237,6 +253,8 @@ fun SurfAreaCard(
     val windGust = windGustMap[surfArea] ?: listOf()
     val windDirection = windDirectionMap[surfArea] ?: listOf()
     val waveHeight = waveHeightMap[surfArea] ?: listOf()
+
+
 
     Card(
         modifier = Modifier
