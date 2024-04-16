@@ -19,6 +19,13 @@ import com.example.myapplication.model.locationforecast.TimeserieLF
 import com.example.myapplication.model.oceanforecast.OceanForecast
 import com.example.myapplication.model.oceanforecast.TimeserieOF
 import com.example.myapplication.ui.home.HomeScreenViewModel
+import com.example.myapplication.ui.surfarea.SurfAreaScreenViewModel
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.VersionCheckResult
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertNotNull
+import junit.framework.TestCase.assertTrue
 import java.io.File
 import org.junit.Test
 //import org.junit.Assert.*
@@ -86,35 +93,28 @@ class ExampleUnitTest {
     @Test
     fun locationForecastTimeSeriesExists() = runBlocking {
         val timeSeries: List<Pair<String, DataLF>> = locationForecastRepository.getTimeSeries(SurfArea.FEDJE)
-        if (timeSeries.isNotEmpty()){
-            println("----------Testen fungerer!----------")
-        }else{
-            println("Testen fungerer ikke")
-        }
-
+        assertTrue("Time series should not be empty", timeSeries.isNotEmpty())
     }
+
     @Test
     fun testGetWindDirection() = runBlocking {
         val windDirectionList: List<Pair<String, Double>> = locationForecastRepository.getWindDirection(SurfArea.FEDJE)
-        println("Test for getWindDirection kjører:")
-        println("Resultat av getWindDirection: $windDirectionList")
-        println("Testen kjører!")
+        assertNotNull("Wind direction list should not be null", windDirectionList)
+        assertFalse("Wind direction list should not be empty", windDirectionList.isEmpty())
     }
 
     @Test
     fun testGetWindSpeed() = runBlocking {
         val windSpeedList: List<Pair<String, Double>> = locationForecastRepository.getWindSpeed(SurfArea.FEDJE)
-        println("Test for getWindSpeed kjører:")
-        println("Resultat av getWindSpeed: $windSpeedList")
-        println("Testen kjører!")
-
+        assertNotNull("Wind speed should not be null", windSpeedList)
+        assertFalse("Wind speed should not be empty", windSpeedList.isEmpty())
     }
+
     @Test
     fun testGetWindSpeedOfGust() = runBlocking {
         val windSpeedOfGust: List<Pair<String, Double>> = locationForecastRepository.getWindSpeedOfGust(SurfArea.FEDJE)
-        println("Test for getWindSpeedOfGust kjører:")
-        println("Resultat av getWindSpeedOfGust: $windSpeedOfGust")
-        print("Testen kjører!")
+        assertNotNull("Wind speed of gust should not be null", windSpeedOfGust)
+        assertFalse("Wind speed of gust should not be empty", windSpeedOfGust.isEmpty())
     }
 
     //SmackLipRepository
