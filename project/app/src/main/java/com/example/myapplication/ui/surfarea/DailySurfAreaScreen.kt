@@ -2,7 +2,9 @@
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +43,7 @@ import com.example.myapplication.R
 import com.example.myapplication.model.surfareas.SurfArea
 import com.example.myapplication.ui.commonComponents.BottomBar
 import com.example.myapplication.ui.surfarea.DailySurfAreaScreenViewModel
+import com.example.myapplication.ui.surfarea.HeaderCard
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,52 +87,65 @@ fun DailySurfAreaScreen(surfAreaName: String, dailySurfAreaScreenViewModel: Dail
                 onNavigateToMapScreen = {
                     navController?.navigate("MapScreen")
                     //navigerer til mapscreen
+                },
+                onNavigateToHomeScreen = {
+                    navController?.navigate("HomeScreen")
+                    // Navigerer til HomeScreen
                 }
 
             )
         }
     )
     { innerPadding ->
-        LazyColumn(
+        Column (
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(12.dp)
-        ) {//vent dette er feil, dette er jo bare for i dag, må fikses med onclick
-            val surfAreaDataForDay = nextSevenDays.getOrElse(0) { emptyList() } //0 er altså i dag
-            if (surfAreaDataForDay.isNotEmpty()) {
-                items(surfAreaDataForDay.size) { hourIndex -> //altså timer igjen av dagen
-                    val surfAreaDataForHour =
-                        surfAreaDataForDay[hourIndex] //henter objektet for timen som er en liste med Pair<List<Int>, Double>
-                    val timestamp = surfAreaDataForHour.first[3] //3??
-                    val waveHeight = surfAreaDataForHour.second[0]
-                    val waveDir = surfAreaDataForHour.second[1]
-                    val windDir = surfAreaDataForHour.second[2]
-                    val windSpeed = surfAreaDataForHour.second[3]
-                    val windGust = surfAreaDataForHour.second[4]
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-                    Log.d("timestamp", "$timestamp")
-                    AllInfoCard(
-                        timestamp = timestamp.toString(),
-                        surfArea = surfArea,
-                        waveHeight = waveHeight,
-                        windSpeed = windSpeed,
-                        windGust = windGust
-                    )
-                }
-            } else {
-                item {
-                    AllInfoCard(
-                        timestamp = "nei",
-                        surfArea = surfArea,
-                        waveHeight = 0.0,
-                        windSpeed = 0.0,
-                        windGust = 0.0
-                    )
+            HeaderCard(surfArea = surfArea)
+            LazyColumn(
+                modifier = Modifier
+                    .padding(5.dp)
+            ) {//vent dette er feil, dette er jo bare for i dag, må fikses med onclick
+                val surfAreaDataForDay =
+                    nextSevenDays.getOrElse(0) { emptyList() } //0 er altså i dag
+                if (surfAreaDataForDay.isNotEmpty()) {
+                    items(surfAreaDataForDay.size) { hourIndex -> //altså timer igjen av dagen
+                        val surfAreaDataForHour =
+                            surfAreaDataForDay[hourIndex] //henter objektet for timen som er en liste med Pair<List<Int>, Double>
+                        val timestamp = surfAreaDataForHour.first[3] //3??
+                        val waveHeight = surfAreaDataForHour.second[0]
+                        val waveDir = surfAreaDataForHour.second[1]
+                        val windDir = surfAreaDataForHour.second[2]
+                        val windSpeed = surfAreaDataForHour.second[3]
+                        val windGust = surfAreaDataForHour.second[4]
+
+                        Log.d("timestamp", "$timestamp")
+                        AllInfoCard(
+                            timestamp = timestamp.toString(),
+                            surfArea = surfArea,
+                            waveHeight = waveHeight,
+                            windSpeed = windSpeed,
+                            windGust = windGust
+                        )
+                    }
+                } else {
+                    item {
+                        AllInfoCard(
+                            timestamp = "nei",
+                            surfArea = surfArea,
+                            waveHeight = 0.0,
+                            windSpeed = 0.0,
+                            windGust = 0.0
+                        )
+                    }
                 }
             }
-        }
 
+        }
 
 
     }

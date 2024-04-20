@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -81,7 +82,8 @@ fun SurfAreaScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
 
                     }
-                }
+                },
+                modifier = Modifier.height(30.dp)
             )
         },
 
@@ -90,6 +92,10 @@ fun SurfAreaScreen(
                 onNavigateToMapScreen = {
                     navController?.navigate("MapScreen")
                     //navigerer til mapscreen
+                },
+                onNavigateToHomeScreen = {
+                    navController?.navigate("HomeScreen")
+                    // Navigerer til HomeScreen
                 }
             )
         }
@@ -107,6 +113,7 @@ fun SurfAreaScreen(
         verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
             HeaderCard(surfArea)
             LazyRow(
                 modifier = Modifier.padding(5.dp)
@@ -284,7 +291,8 @@ fun DayPreviewCard(surfArea: SurfArea, day: String, waveheight: String, onNaviga
             .width(93.dp)
             .height(147.dp)
             .background(color = SchemesSurface, shape = RoundedCornerShape(size = 20.dp))
-            .clickable{ onNavigateToDailySurfAreaScreen(surfArea.locationName)
+            .clickable {
+                onNavigateToDailySurfAreaScreen(surfArea.locationName)
             }
 
     ){
