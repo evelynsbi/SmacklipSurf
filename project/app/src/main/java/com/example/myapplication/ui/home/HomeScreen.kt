@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.NavigationManager
 import com.example.myapplication.R
 import com.example.myapplication.model.metalerts.Features
 import com.example.myapplication.model.metalerts.Properties
@@ -68,6 +70,7 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNaviga
     val homeScreenUiState: HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
     val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
     val isSearchActive = remember { mutableStateOf(false) }
+    val navController = NavigationManager.navController
 
     Scaffold(
         topBar = {
@@ -83,7 +86,12 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNaviga
             }
         },
         bottomBar = {
-            BottomBar()
+            BottomBar(
+                onNavigateToMapScreen = {
+                    navController?.navigate("MapScreen")
+                    // Navigerer til MapScreen
+                }
+            )
         }
     ) { innerPadding ->
         Column(
