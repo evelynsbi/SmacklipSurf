@@ -16,11 +16,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Tsunami
+//import androidx.compose.material.icons.outlined.Tsunami
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,6 +53,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurfAreaScreen(
     surfAreaName: String,
@@ -65,7 +71,19 @@ fun SurfAreaScreen(
 
     val formatter = DateTimeFormatter.ofPattern("EEE", Locale("no", "NO"))
     val navController = NavigationManager.navController
+
     Scaffold(
+        topBar ={
+            TopAppBar(title = { /*TODO*/ },
+                navigationIcon = {
+                    IconButton(onClick = { navController?.popBackStack()}) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+
+                    }
+                }
+            )
+        },
+
         bottomBar = {
             BottomBar(
                 onNavigateToMapScreen = {
@@ -74,6 +92,8 @@ fun SurfAreaScreen(
                 }
             )
         }
+
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
