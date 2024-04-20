@@ -1,7 +1,5 @@
 package com.example.myapplication.ui.surfarea
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,7 +47,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SurfAreaScreen(
     surfAreaName: String,
@@ -167,7 +164,7 @@ fun InfoCard(surfArea: SurfArea) {
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun HeaderCard(surfArea: SurfArea) {
 
@@ -333,7 +330,6 @@ fun DayPreviewCard(surfArea: SurfArea, day: String, waveheight: String, onNaviga
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 private fun PreviewSurfAreaScreen() {
