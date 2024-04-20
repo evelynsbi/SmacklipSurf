@@ -18,6 +18,7 @@ import com.example.myapplication.ui.commonComponents.BottomBar
 import com.example.myapplication.ui.home.HomeScreen
 import com.example.myapplication.ui.map.MapScreen
 import com.example.myapplication.ui.surfarea.SurfAreaScreen
+import com.example.myapplication.NavigationManager
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -40,6 +41,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SmackLipNavigation(){
     val navController = rememberNavController()
+    NavigationManager.navController = navController
     NavHost(
         navController = navController,
         startDestination = "HomeScreen",
