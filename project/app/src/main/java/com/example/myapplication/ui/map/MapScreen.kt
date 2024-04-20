@@ -80,7 +80,9 @@ fun MapScreen(mapScreenViewModel : MapScreenViewModel = viewModel()) {
                     Text(text = "Locations")
                 })
         },
-       // bottomBar = { BottomBar() } kartet vises ikke og topappbar blir borte??
+        bottomBar = {
+            BottomBar()
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -263,7 +265,9 @@ fun SurfAreaCard(
                 horizontalArrangement = Arrangement.Center
             ){
                 Button(onClick = onCloseClick, //TODO: må byttes ut med navigation
-                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
                     Text("Gå til "+surfArea.locationName)
                 }
