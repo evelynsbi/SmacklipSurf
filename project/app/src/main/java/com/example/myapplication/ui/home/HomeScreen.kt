@@ -64,7 +64,7 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNavigateToSurfAreaScreen: (String) -> Unit ){
+fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNavigateToSurfAreaScreen: (String) -> Unit = {}){
     val homeScreenUiState: HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
     val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
     val isSearchActive = remember { mutableStateOf(false) }
@@ -138,6 +138,8 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNaviga
         }
     }
 }
+
+
 
 @Composable
 fun SearchBar(
