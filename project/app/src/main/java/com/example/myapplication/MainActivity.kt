@@ -14,7 +14,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.model.surfareas.SurfArea
+import com.example.myapplication.ui.commonComponents.BottomBar
 import com.example.myapplication.ui.home.HomeScreen
+import com.example.myapplication.ui.map.MapScreen
 import com.example.myapplication.ui.surfarea.SurfAreaScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
@@ -52,5 +54,15 @@ fun SmackLipNavigation(){
             val surfArea = backStackEntry.arguments?.getString("surfArea") ?: ""
             SurfAreaScreen(surfAreaName = surfArea){}
         }
+        composable("BottomBar"){
+            BottomBar(
+                onNavigateToMapScreen = { navController.navigate("MapScreen")},
+                onNavigateToHomeScreen = {navController.navigate("HomeScreen")}
+            )
+        }
+        composable("MapScreen"){
+            MapScreen()
+        }
+
     }
 }
