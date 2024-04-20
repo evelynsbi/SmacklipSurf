@@ -1,0 +1,9 @@
+syntax = "proto3";
+option java_package = "com.example.myapplication";
+option java_multiple_files = true;
+
+message Settings {
+  // settings variables
+  // alle må ha forskjellige initial values
+  double test = 1;
+}
