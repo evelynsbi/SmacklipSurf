@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.surfarea
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,7 +59,7 @@ import java.util.Locale
 fun SurfAreaScreen(
     surfAreaName: String,
     surfAreaScreenViewModel: SurfAreaScreenViewModel = viewModel(),
-    onNavigateToDailySurfAreaScreen: (String) -> Unit
+    onNavigateToDailySurfAreaScreen: (String) -> Unit = {}
 ) {
 
     val surfArea: SurfArea = SurfArea.entries.find {
@@ -129,8 +130,9 @@ fun SurfAreaScreen(
                         DayPreviewCard(
                             surfArea,
                             formattedDate,
-                            maxWaveHeightperDay.toString()
-                        ) {}
+                            maxWaveHeightperDay.toString(),
+                            onNavigateToDailySurfAreaScreen
+                        )
                     }
                 } else {
                     items(6) { dayIndex ->
@@ -282,9 +284,9 @@ fun DayPreviewCard(surfArea: SurfArea, day: String, waveheight: String, onNaviga
             .width(93.dp)
             .height(147.dp)
             .background(color = SchemesSurface, shape = RoundedCornerShape(size = 20.dp))
-            .clickable(
-                onClick = { onNavigateToDailySurfAreaScreen(surfArea.locationName) }
-            )
+            .clickable{ onNavigateToDailySurfAreaScreen(surfArea.locationName)
+            }
+
     ){
         Column(
             modifier = Modifier
