@@ -15,4 +15,5 @@ class SettingsScreenViewModel(private val settingsRepository: SettingsRepository
             settingsRepository.setTest(test)
         }
     }
+
 }
