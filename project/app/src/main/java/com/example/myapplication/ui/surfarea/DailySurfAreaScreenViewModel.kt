@@ -42,6 +42,7 @@ class DailySurfAreaScreenViewModel: ViewModel() {
                 Log.d("DSVM", "Updating statuses")
                 val newConditionStatuses: MutableList<Map<List<Int>, ConditionStatus>> = mutableListOf()
                 if (forecast.isEmpty()) {
+                    Log.d("DSVM", "Forecast empty, quitting update")
                     return@launch
                 }
 
@@ -100,7 +101,7 @@ class DailySurfAreaScreenViewModel: ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
 
             _dailySurfAreaScreenUiState.update {
-                if (surfArea == it.location) {
+                if (surfArea == it.location && it.wavePeriods.isNotEmpty()) {
                     Log.d("DSVM", "Waveperiods already updated for $surfArea")
                     return@launch
                 }
