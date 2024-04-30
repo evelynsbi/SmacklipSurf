@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.surfarea
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
@@ -78,7 +79,11 @@ class DailySurfAreaScreenViewModel: ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             //starte loading screen - det første som kalles fra DailySurfScreen
             _dailySurfAreaScreenUiState.update {
-                it.copy(loading = true)
+                if (surfArea == it.location) {
+                    Log.d("DSVM", "Data already updated for $surfArea")
+                    return@launch
+                }
+                it.copy(loading = true, location = surfArea)
             }
             _dailySurfAreaScreenUiState.update {state ->
                 val newForecast7Days: List<Map<List<Int>, List<Any>>> = smackLipRepository.getSurfAreaOFLFNext7Days(surfArea)
