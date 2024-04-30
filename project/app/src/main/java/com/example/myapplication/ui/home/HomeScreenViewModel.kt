@@ -1,13 +1,20 @@
 package com.example.myapplication.ui.home
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
+import com.example.myapplication.model.locationforecast.DataLF
 import com.example.myapplication.model.metalerts.Features
+import com.example.myapplication.model.oceanforecast.DataOF
 import com.example.myapplication.model.surfareas.SurfArea
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +22,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalTime
+import kotlin.system.exitProcess
 
 data class HomeScreenUiState(
     val locationName: String = "",
@@ -25,7 +35,8 @@ data class HomeScreenUiState(
     val waveDirections: Map<SurfArea, List<Pair<List<Int>, Double>>> = emptyMap(),
     val wavePeriods: Map<SurfArea, List<Double?>> = emptyMap(),
     val windPeriods: Map<SurfArea, List<Double?>> = emptyMap(),
-    val allRelevantAlerts: List<List<Features>> = emptyList()
+    val allRelevantAlerts: Map<SurfArea, List<Features>> = emptyMap(),
+    val loading: Boolean = false
 )
 
 class HomeScreenViewModel : ViewModel() {
@@ -36,15 +47,92 @@ class HomeScreenViewModel : ViewModel() {
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
     val searchQuery = _searchQuery.asStateFlow()
     val favoriteSurfAreas: StateFlow<List<SurfArea>> = _favoriteSurfAreas
+    //val loading = mutableStateOf(false)
 
     init {
-        updateWindSpeed()
-        updateWindGust()
-        updateWindDirection()
-        updateWaveHeight()
+        updateOFLF()
         updateAlerts()
+    }
+
+    fun updateOFLF() {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            _homeScreenUiState.update {
+                it.copy(loading = true)
+            }
+            val date = LocalDate.now()
+
+            val allSurfAreas : Map<SurfArea, Deferred<Pair<Map<Int, List<Pair<String, DataOF>>>, Map<Int, List<Pair<String, DataLF>>>>>> = SurfArea.entries.associateWith {
+                val timeSeries: Deferred<Pair<Map<Int, List<Pair<String, DataOF>>>, Map<Int, List<Pair<String, DataLF>>>>> = async { smackLipRepository.getTimeSeriesOFLF(it) }
+                timeSeries
+            }
+            Log.d("allSurfAreas ", allSurfAreas.toString())
+
+            val allSurfAreasToday = SurfArea.entries.associateWith {
+                val timeseries = allSurfAreas[it]!!.await()
+                smackLipRepository.getOFLFOneDay(date.dayOfMonth, date.monthValue, timeseries)
+            }
+            Log.d("allSurfAreasToday ", allSurfAreasToday.toString())
+
+            // returnerer map<tidspunkt-> [windSpeed, windSpeedOfGust, windDirection, airTemperature, symbolCode, Waveheight, waveDirection]>
+            val newWindSpeed = allSurfAreasToday.keys.associateWith {
+                val dataToday:  Map<List<Int>, List<Any>> = allSurfAreasToday[it]!!
+                val windSpeed = dataToday.map { entry ->
+                    Pair(entry.key, entry.value[0] as Double)
+                }
+                Log.d("newWindSpeed ", windSpeed.toString())
+                windSpeed
+            }
+            val newWindGust = allSurfAreasToday.keys.associateWith {
+                val dataToday:  Map<List<Int>, List<Any>> = allSurfAreasToday[it]!!
+                val windGust = dataToday.map { entry ->
+                    Pair(entry.key, entry.value[1] as Double)
+                }
+                windGust
+            }
+            val newWindDir = allSurfAreasToday.keys.associateWith {
+                val dataToday:  Map<List<Int>, List<Any>> = allSurfAreasToday[it]!!
+                val windSpeed = dataToday.map { entry ->
+                    Pair(entry.key, entry.value[2] as Double)
+                }
+                windSpeed
+            }
+
+            val newWaveHeights = allSurfAreasToday.keys.associateWith {
+                val dataToday:  Map<List<Int>, List<Any>> = allSurfAreasToday[it]!!
+                val windSpeed = dataToday.map { entry ->
+                    try {Pair(entry.key, entry.value[5] as Double)}
+                    catch (e: IndexOutOfBoundsException) {
+                        Log.e("HSVMERROR", "Entry at ${entry.key} was ${entry.value}")
+                        exitProcess(1)
+                    }
+                }
+                windSpeed
+            }
+            val newWaveDirs = allSurfAreasToday.keys.associateWith {
+                val dataToday:  Map<List<Int>, List<Any>> = allSurfAreasToday[it]!!
+                val windSpeed = dataToday.map { entry ->
+                    Pair(entry.key, entry.value[6] as Double)
+                }
+                windSpeed
+            }
+
+            _homeScreenUiState.update {
+                it.copy(
+                    windSpeed = newWindSpeed,
+                    windGust = newWindGust,
+                    windDirection = newWindDir,
+                    waveHeight = newWaveHeights,
+                    waveDirections = newWaveDirs,
+                    loading = false
+                )
+            }
+
+        }
 
     }
+
+
 
     fun updateWindSpeed() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -129,12 +217,16 @@ class HomeScreenViewModel : ViewModel() {
 
     fun updateAlerts() {
         viewModelScope.launch(Dispatchers.IO) {
-            val allAlerts: MutableList<List<Features>> = mutableListOf()
-            SurfArea.entries.forEach { surfArea ->
-                allAlerts.add(smackLipRepository.getRelevantAlertsFor(surfArea))
+            _homeScreenUiState.update {
+                it.copy(loading = true)
+            }
+            val allAlerts = SurfArea.entries.associateWith {
+                smackLipRepository.getRelevantAlertsFor(it)
             }
             _homeScreenUiState.update {
-                it.copy(allRelevantAlerts = allAlerts.toList())
+                it.copy(
+                    allRelevantAlerts = allAlerts,
+                    loading = false)
             }
         }
     }
@@ -157,24 +249,6 @@ class HomeScreenViewModel : ViewModel() {
         }
     }
 
-    /* val searchResults: StateFlow<List<SurfArea>> =
-        snapshotFlow { searchQuery }
-            .combine(flowOf(listOf(SurfArea.entries))) { searchQuery, surfAreas ->
-                when {
-                    searchQuery.isNotEmpty() -> surfAreas.filter { surfArea ->
-                        surfArea.locationName.contains(searchQuery, ignoreCase = true)
-                    }
-                    else -> surfAreas
-                }
-            }.stateIn(
-                scope = viewModelScope,
-                initialValue = emptyList()
-            )
-
-    fun onSearchQueryChange(newQuery: String) {
-        searchQuery = newQuery
-    } */
-
     fun updateFavorites(surfArea: SurfArea) {
         if (_favoriteSurfAreas.value.contains(surfArea)) {
             _favoriteSurfAreas.value -= surfArea
@@ -190,4 +264,8 @@ class HomeScreenViewModel : ViewModel() {
             R.drawable.empty_star_icon
         }
     }
+
+
+
+
 }

@@ -3,6 +3,12 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="MainActivity">
+<<<<<<< HEAD
+=======
+        <State />
+      </entry>
+      <entry key="app">
+>>>>>>> 4b77257fbfae5dd39c84a073386ec9718452d785
         <State />
       </entry>
     </value>

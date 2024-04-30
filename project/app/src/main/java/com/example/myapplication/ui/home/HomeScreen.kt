@@ -6,7 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,20 +23,23 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.outlined.CallMade
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,10 +47,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,19 +64,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.NavigationManager
 import com.example.myapplication.R
 import com.example.myapplication.model.metalerts.Features
 import com.example.myapplication.model.metalerts.Properties
 import com.example.myapplication.model.surfareas.SurfArea
-import com.example.myapplication.ui.commonComponents.BottomBar
+import com.example.myapplication.ui.common.composables.BottomBar
+import com.example.myapplication.ui.common.composables.ProgressIndicator
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNavigateToSurfAreaScreen: (String) -> Unit ){
+fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNavigateToSurfAreaScreen: (String) -> Unit = {}){
     val homeScreenUiState: HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
     val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
     val isSearchActive = remember { mutableStateOf(false) }
+    val navController = NavigationManager.navController
 
     Scaffold(
         topBar = {
@@ -78,12 +90,18 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNaviga
                     onActiveChanged = { isActive ->
                         isSearchActive.value = isActive
                     },
-                    surfAreas = SurfArea.entries.toList()
+                    surfAreas = SurfArea.entries.toList(),
+                    onNavigateToSurfAreaScreen = onNavigateToSurfAreaScreen
                 )
             }
         },
         bottomBar = {
-            BottomBar()
+            BottomBar(
+                onNavigateToMapScreen = {
+                    navController?.navigate("MapScreen")
+                    // Navigerer til MapScreen
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -91,64 +109,72 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNaviga
                 .padding(innerPadding)
                     //.verticalScroll(rememberScrollState())
         ) {
-            FavoritesList(
-                favorites = favoriteSurfAreas,
-                windSpeedMap = homeScreenUiState.windSpeed,
-                windGustMap = homeScreenUiState.windGust,
-                windDirectionMap = homeScreenUiState.windDirection,
-                waveHeightMap = homeScreenUiState.waveHeight,
-                alerts = homeScreenUiState.allRelevantAlerts,
-                onNavigateToSurfAreaScreen = onNavigateToSurfAreaScreen
-            )
-            Column {
-
-                Text(
-                    text = "Alle lokasjoner",
-                    style = TextStyle(
-                        fontSize = 13.sp,
-                        //fontFamily = FontFamily(Font(R.font.inter))
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF9A938C)
-                    )
-                )
-            }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.Center)
-            {
-                items(SurfArea.entries) { location ->
-                    SurfAreaCard(
-                        location,
+            Box(modifier = Modifier.fillMaxSize()){
+                Column (modifier = Modifier.fillMaxSize()){
+                    FavoritesList(
+                        favorites = favoriteSurfAreas,
                         windSpeedMap = homeScreenUiState.windSpeed,
                         windGustMap = homeScreenUiState.windGust,
                         windDirectionMap = homeScreenUiState.windDirection,
                         waveHeightMap = homeScreenUiState.waveHeight,
-                        alerts = homeScreenUiState.allRelevantAlerts.filter { alert ->
-                            alert.any {
-                                it.properties?.area?.contains(location.locationName) ?: false }
-                        },
-                        homeScreenViewModel = homeScreenViewModel,
+                        alerts = homeScreenUiState.allRelevantAlerts,
                         onNavigateToSurfAreaScreen = onNavigateToSurfAreaScreen
                     )
+                    Column {
+
+                        Text(
+                            text = "  Alle lokasjoner",
+                            style = TextStyle(
+                                fontSize = 15.sp,
+                                //fontFamily = FontFamily(Font(R.font.inter))
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFF9A938C)
+                            )
+                        )
+                    }
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.Center)
+                    {
+                        items(SurfArea.entries) { location ->
+                            SurfAreaCard(
+                                location,
+                                windSpeedMap = homeScreenUiState.windSpeed,
+                                windGustMap = homeScreenUiState.windGust,
+                                windDirectionMap = homeScreenUiState.windDirection,
+                                waveHeightMap = homeScreenUiState.waveHeight,
+                                alerts = homeScreenUiState.allRelevantAlerts[location],
+                                homeScreenViewModel = homeScreenViewModel,
+                                onNavigateToSurfAreaScreen = onNavigateToSurfAreaScreen
+                            )
+                        }
+                    }
                 }
+                ProgressIndicator(isDisplayed = homeScreenUiState.loading)
+
             }
         }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchBar(
+    surfAreas: List<SurfArea>,
     onQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
     onActiveChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     onSearch: ((String) -> Unit)? = null,
-    surfAreas: List<SurfArea>
+    onNavigateToSurfAreaScreen: (String) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     val activeChanged: (Boolean) -> Unit = { active ->
         if (!active) {
@@ -158,64 +184,93 @@ fun SearchBar(
         onActiveChanged(active)
     }
 
-    TextField(
-        value = searchQuery,
-        onValueChange = { query ->
-            searchQuery = query
-            onQueryChange(query)
-            activeChanged(true)
-        },
-        modifier = modifier
-            .padding(start = 12.dp, top = 2.dp, end = 12.dp, bottom = 12.dp)
-            .fillMaxWidth(),
-        placeholder = { Text("Søk etter surfeområde") },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        },
-        trailingIcon = {
-            if(isSearchActive) {
-                IconButton(
-                    onClick = {
-                        searchQuery = ""
-                        onQueryChange("")
-                        onActiveChanged(false)
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            modifier = modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            shape = CircleShape,
+            value = searchQuery,
+            onValueChange = { query ->
+                searchQuery = query
+                onQueryChange(query)
+                activeChanged(true)
+                expanded = true
+            },
+            placeholder = { Text("Søk etter surfeområde") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Search,
+                    contentDescription = "Search icon",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            trailingIcon = {
+                if (isSearchActive) {
+                    IconButton(
+                        onClick = {
+                            searchQuery = ""
+                            onQueryChange("")
+                            onActiveChanged(false)
+                            focusManager.clearFocus()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear searchbar"
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear searchbar"
-                    )
                 }
-            }
-        },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Search
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                onSearch?.invoke(searchQuery)
-                activeChanged(false)
-            }
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    onSearch?.invoke(searchQuery)
+                    activeChanged(false)
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                }
+            )
         )
-    )
-    if (searchQuery.isNotEmpty()) {
-        val filteredSurfAreas = surfAreas.filter { it.locationName.contains(searchQuery, ignoreCase = true) }
-        if (filteredSurfAreas.isNotEmpty()) {
-            LazyColumn {
-                items(filteredSurfAreas) {surfArea ->
-                    Text(
-                        text = surfArea.locationName,
-                        modifier = Modifier.clickable { onSearch?.invoke(surfArea.locationName) }
-                    )
+        if (expanded && searchQuery.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+            ) {
+                val filteredSurfAreas =
+                    surfAreas.filter { it.locationName.contains(searchQuery, ignoreCase = true) }
+                items(filteredSurfAreas) { surfArea ->
+                    Column(modifier = Modifier.clickable {
+                        onNavigateToSurfAreaScreen(surfArea.locationName)
+                    }) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = surfArea.locationName,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Image(
+                                painter = painterResource(id = surfArea.image),
+                                contentDescription = "SurfArea image",
+                                modifier = Modifier.size(48.dp),
+                                contentScale = ContentScale.Crop,
+                                alignment = Alignment.CenterEnd
+                            )
+                        }
+                        Divider(modifier = Modifier.padding(horizontal = 12.dp))
+                    }
                 }
             }
-        } else {
-            Text("Ingen samsvarende surfeområder funnet")
+            /* if (searchQuery.isNotEmpty() && filteredSurfAreas.isEmpty() && expanded) {
+            Text("Ingen samsvarende resultater")
+        } */
         }
     }
 }
@@ -224,22 +279,22 @@ fun SearchBar(
 implement windspeedmap, windgustmap, waveheightmap and alerts correctly,
 to receive accurate values in favorite surfareacards
  */
+
 @Composable
 fun FavoritesList(
     favorites: List<SurfArea>,
     windSpeedMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     windGustMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
-    windDirectionMap:Map<SurfArea, List<Pair<List<Int>, Double>>>,
+    windDirectionMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     waveHeightMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
-    alerts: List<List<Features>>?,
+    alerts: Map<SurfArea, List<Features>>?,
     onNavigateToSurfAreaScreen: (String) -> Unit
 ) {
     Column {
-
         Text(
-            text = "Favoritter",
+            text = "  Favoritter",
             style = TextStyle(
-                fontSize = 13.sp,
+                fontSize = 15.sp,
                 //fontFamily = FontFamily(Font(R.font.inter))
                 fontWeight = FontWeight(400),
                 color = Color(0xFF9A938C)
@@ -252,16 +307,16 @@ fun FavoritesList(
                 Card(
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 8.dp)
-                        .size(width = 135.89417.dp, height = 251.48856.dp)
+                        .size(width = 150.0.dp, height = 200.00.dp)
                         .clip(RoundedCornerShape(10.dp))
                 ) {
                     SurfAreaCard(
                         surfArea = surfArea,
                         windSpeedMap = windSpeedMap,
                         windGustMap = windGustMap,
-                        windDirectionMap = emptyMap(),
+                        windDirectionMap = windDirectionMap,
                         waveHeightMap = waveHeightMap,
-                        alerts = alerts,
+                        alerts = alerts?.get(surfArea),
                         homeScreenViewModel = HomeScreenViewModel(),
                         showFavoriteButton = false,
                         onNavigateToSurfAreaScreen = onNavigateToSurfAreaScreen
@@ -279,11 +334,9 @@ fun FavoritesList(
                             painter = painterResource(id = R.drawable.icon_awareness_yellow_outlined),
                             contentDescription = "warning icon",
                             modifier = Modifier
-                                .padding(8.dp))
-
-
+                                .padding(8.dp)
+                        )
                     }
-
                 }
             }
         }
@@ -298,10 +351,9 @@ fun EmptyFavoriteCard() {
         modifier =
         Modifier
             .wrapContentSize()
-            .padding(start = 8.dp, top = 10.dp, end = 10.dp, bottom = 10.dp)
+            .padding(start = 8.dp, top = 10.dp, end = 8.dp, bottom = 8.dp)
             //.border(width = 0.80835.dp, color = Color(0xFFBEC8CA), shape = RoundedCornerShape(size = 6.70023.dp ))
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .size(width = 135.89417.dp, height = 251.48856.dp)
+            .size(width = 150.dp, height = 200.dp)
             .background(color = Color(0xFFF5FAFB))
             .clip(RoundedCornerShape(10.dp))
 
@@ -328,7 +380,7 @@ fun SurfAreaCard(
     windGustMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     windDirectionMap: Map<SurfArea, List<Pair<List<Int>, Double>>>,
     waveHeightMap: Map<SurfArea,List<Pair<List<Int>, Double>>>,
-    alerts: List<List<Features>>?,
+    alerts: List<Features>?,
     homeScreenViewModel: HomeScreenViewModel,
     showFavoriteButton: Boolean = true,
     onNavigateToSurfAreaScreen: (String) -> Unit
@@ -339,7 +391,14 @@ fun SurfAreaCard(
     val windDirection = windDirectionMap[surfArea] ?: listOf()
     val waveHeight = waveHeightMap[surfArea] ?: listOf()
 
-
+    // windDirection
+    val rotationAngleWind: Float = when {
+        windDirection.isNotEmpty() -> {
+            val angle = windDirection[0].second.toFloat()
+            angle
+        }
+        else -> 0f
+    }
 
     Card(
         modifier = Modifier
@@ -380,9 +439,7 @@ fun SurfAreaCard(
                 horizontalAlignment = Alignment.Start,
             )
             {
-
                 Row {
-
                     Text(
                         text = surfArea.locationName,
                         style = TextStyle(
@@ -395,6 +452,7 @@ fun SurfAreaCard(
 
                     )
                 }
+
                 Row {
                     Image(
                         painter = painterResource(id = R.drawable.tsunami),
@@ -409,7 +467,6 @@ fun SurfAreaCard(
                     Text(
                         text = " ${if (waveHeight.isNotEmpty()) "${waveHeight[0].second}m" else ""}"
                     )
-
                 }
 
                 Row {
@@ -422,27 +479,22 @@ fun SurfAreaCard(
                             .height(13.6348.dp)
                     )
                     Text(
-                        text = " ${if (windSpeed.isNotEmpty()) windSpeed[0].second else ""}" +
-                                if(windGust.isNotEmpty() && windSpeed.isNotEmpty() && windGust[0].second != windSpeed[0].second) "(${windGust[0].second})" else ""
+                        text = " ${if (windSpeed.isNotEmpty()) (windSpeed[0].second).toInt() else ""}" +
+                                if(windGust.isNotEmpty() && windSpeed.isNotEmpty() && windGust[0].second != windSpeed[0].second) "(${windGust[0].second.toInt()})" else ""
                     )
                     Text(
                         text = " ${if (windDirection.isNotEmpty()) "${windDirection[0].second}°" else ""}"
                     )
 
-
-
-                    /*Image(
-                        painter = painterResource(id = R.drawable.arrow),
+                    Icon(
+                        imageVector = Icons.Outlined.CallMade,
                         contentDescription = "arrow icon",
                         modifier = Modifier
-
-
+                            .width(17.dp)
+                            .height(17.dp)
+                            .rotate(rotationAngleWind)
                     )
-
-                     */
                 }
-
-
 
                 /*
                 Row {
@@ -483,8 +535,6 @@ fun SurfAreaCard(
                                 .width(162.dp)
                                 .height(100.dp)
                                 .clip(RoundedCornerShape(8.dp))
-
-
                         )
                     }
                 }
@@ -517,7 +567,7 @@ private fun PreviewSurfAreaCard() {
             windGustMap,
             windDirectionMap,
             waveHeightMap,
-            listOf(listOf((Features(properties = Properties(description = "Det ræinar"))))),
+            listOf((Features(properties = Properties(description = "Det ræinar")))),
             viewModel,
             true
         ) {}

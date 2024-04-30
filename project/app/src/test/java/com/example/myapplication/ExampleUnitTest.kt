@@ -1,41 +1,31 @@
 package com.example.myapplication
 
-import android.view.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+
 import com.example.myapplication.data.locationForecast.LocationForecastRepositoryImpl
 import com.example.myapplication.data.metalerts.MetAlertsDataSource
-import com.example.myapplication.model.locationforecast.DataLF
-import kotlinx.coroutines.runBlocking
-import com.example.myapplication.model.metalerts.MetAlerts
-import com.google.gson.Gson
 import com.example.myapplication.data.metalerts.MetAlertsRepositoryImpl
-
-
 import com.example.myapplication.data.oceanforecast.OceanforecastRepositoryImpl
 import com.example.myapplication.data.smackLip.SmackLipRepository
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
-
 import com.example.myapplication.data.waveforecast.WaveForecastDataSource
 import com.example.myapplication.data.waveforecast.WaveForecastRepository
 import com.example.myapplication.data.waveforecast.WaveForecastRepositoryImpl
-import com.example.myapplication.model.surfareas.SurfArea
-
-
+import com.example.myapplication.model.locationforecast.DataLF
 import com.example.myapplication.model.locationforecast.LocationForecast
 import com.example.myapplication.model.locationforecast.TimeserieLF
-
 import com.example.myapplication.model.oceanforecast.OceanForecast
 import com.example.myapplication.model.oceanforecast.TimeserieOF
-import com.example.myapplication.ui.surfarea.SurfAreaScreenViewModel
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.VersionCheckResult
-import junit.framework.TestCase.assertEquals
+import com.example.myapplication.model.surfareas.SurfArea
+import com.google.gson.Gson
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
-import java.io.File
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import java.io.File
+import java.time.LocalDate
+import kotlin.system.measureTimeMillis
+
 //import org.junit.Assert.*
 
 /**
@@ -55,6 +45,8 @@ class ExampleUnitTest {
     @Test
     fun fetchAvaliableTimestampsReturns20ForecastTimes() = runBlocking {
         val response = waveForecastDataSource.fetchAvaliableTimestamps()
+        println("her:")
+        println(response)
         assert(response.availableForecastTimes.size > 0) {
             "fetchAvailableTimestamps() returns no timestamps"
         }
@@ -64,30 +56,43 @@ class ExampleUnitTest {
     fun accessTokenIsAcquired() = runBlocking {
         val (accessToken, refreshToken) = waveForecastDataSource.getAccessToken()
         assert(accessToken.isNotBlank()) {"No token was retrieved"}
+        println("her:")
+        println(accessToken)
     }
 
     //fast ver.
     @Test
     fun allRelevantWavePeriodAndDirsGet60HrsOfData() = runBlocking {
-        val relevantForecasts = waveForecastRepository.allRelevantWavePeriodAndDirNext3Days()
+        val relevantForecasts = waveForecastRepository.allRelevantWavePeriodsNext3DaysHardCoded()
         relevantForecasts.forEach {
             println(it)
         }
         assert(relevantForecasts.size == SurfArea.entries.size) {"Missing forecast(s) for certain surfarea(s)"}
-        assert(relevantForecasts.all { (_, forecast) -> forecast.size in 18 .. 21 }) {"Some forecast is not of length 21 (ie. 60hrs long)"}
+        assert(relevantForecasts.all { (_, forecast) -> forecast.size in 19 .. 21 }) {"Some forecast is not of length 21 (ie. 60hrs long)"}
     }
 
     @Test
     fun waveDirAndPeriodNext3DaysForHoddevikIs3DaysLong() = runBlocking{
-        val result = waveForecastRepository.waveDirAndPeriodNext3DaysForArea(SurfArea.HODDEVIK.modelName, SurfArea.HODDEVIK.pointId)
-        assert(result.size in 18 .. 21) {"Forecast for hoddevik should be of size 21, was ${result.size}"}
+        val result = waveForecastRepository.wavePeriodsNext3DaysForArea(SurfArea.HODDEVIK.modelName, SurfArea.HODDEVIK.pointId)
+        assert(result.size in 19 .. 21) {"Forecast for hoddevik should be of size 21, was ${result.size}"}
     }
 
     @Test
-    fun hardcodedWaveForecastIsSameAsNonHardcoded() = runBlocking{
-        val hardcoded = waveForecastRepository.allRelevantWavePeriodAndDirNext3DaysHardCoded()
-        val nonHardcoded = waveForecastRepository.allRelevantWavePeriodAndDirNext3Days()
-        assert(hardcoded==nonHardcoded)
+    fun smackLipWavePeriodsForAreaAreSize60()= runBlocking{
+        val wavePeriods = smackLipRepository.getWavePeriodsNext3DaysForArea(SurfArea.HODDEVIK)
+        assert(wavePeriods.size in 57 .. 63) {"was size ${wavePeriods.size}"}
+        println(wavePeriods)
+        assert(wavePeriods[0] == wavePeriods[1] && wavePeriods[1] == wavePeriods[2]) {"${wavePeriods[0]}, ${wavePeriods[1]}, ${wavePeriods[2]} differ"}
+    }
+
+    @Test
+    fun smackLipAllWavePeriodsAreSize60() = runBlocking{
+        val wavePeriods = smackLipRepository.getAllWavePeriodsNext3Days()
+        assert(wavePeriods.isNotEmpty())
+        wavePeriods.forEach{(sa, tps) ->
+            assert(tps.size in 57..63) {"Size of $sa was ${tps.size}"}
+            assert(tps[0] == tps[1] && tps[1] == tps[2]) {"${tps[0]}, ${tps[1]}, ${tps[2]} differ"}
+        }
     }
 
     @Test
@@ -177,34 +182,34 @@ class ExampleUnitTest {
         val locationForecast: LocationForecast = gson.fromJson(locationJson, LocationForecast::class.java)
         val timeseriesListLF: List<TimeserieLF> = locationForecast.properties.timeseries
         val timeSeriesLF = timeseriesListLF.map { it.time to it.data }
-        val windDirectionForecast = locationForecastRepository.getWindDirection(SurfArea.FEDJE)
+        val windDirectionForecast = locationForecastRepository.getWindDirection(SurfArea.HODDEVIK)
         assert(timeSeriesLF[0].second.instant.details.wind_from_direction == windDirectionForecast[0].second)
         assert(timeSeriesLF[10].second.instant.details.wind_from_direction == windDirectionForecast[10].second)
     }
 
     @Test
     fun locationForecastTimeSeriesExists() = runBlocking {
-        val timeSeries: List<Pair<String, DataLF>> = locationForecastRepository.getTimeSeries(SurfArea.FEDJE)
+        val timeSeries: List<Pair<String, DataLF>> = locationForecastRepository.getTimeSeries(SurfArea.HODDEVIK)
         assertTrue("Time series should not be empty", timeSeries.isNotEmpty())
     }
 
     @Test
     fun testGetWindDirection() = runBlocking {
-        val windDirectionList: List<Pair<String, Double>> = locationForecastRepository.getWindDirection(SurfArea.FEDJE)
+        val windDirectionList: List<Pair<String, Double>> = locationForecastRepository.getWindDirection(SurfArea.HODDEVIK)
         assertNotNull("Wind direction list should not be null", windDirectionList)
         assertFalse("Wind direction list should not be empty", windDirectionList.isEmpty())
     }
 
     @Test
     fun testGetWindSpeed() = runBlocking {
-        val windSpeedList: List<Pair<String, Double>> = locationForecastRepository.getWindSpeed(SurfArea.FEDJE)
+        val windSpeedList: List<Pair<String, Double>> = locationForecastRepository.getWindSpeed(SurfArea.HODDEVIK)
         assertNotNull("Wind speed should not be null", windSpeedList)
         assertFalse("Wind speed should not be empty", windSpeedList.isEmpty())
     }
 
     @Test
     fun testGetWindSpeedOfGust() = runBlocking {
-        val windSpeedOfGust: List<Pair<String, Double>> = locationForecastRepository.getWindSpeedOfGust(SurfArea.FEDJE)
+        val windSpeedOfGust: List<Pair<String, Double>> = locationForecastRepository.getWindSpeedOfGust(SurfArea.HODDEVIK)
         assertNotNull("Wind speed of gust should not be null", windSpeedOfGust)
         assertFalse("Wind speed of gust should not be empty", windSpeedOfGust.isEmpty())
     }
@@ -222,22 +227,13 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun waveHeightsAreParsedCorrectly() = runBlocking {
-        val dataNext7 = smackLipRepository.getDataForTheNext7Days(SurfArea.HODDEVIK)
-        val waveHeights = dataNext7.map{ dayForecast -> dayForecast.map { dayData -> dayData.first to dayData.second[0]}}
-        println("Size of all wave heights ${waveHeights.size}")
-        println("Size of waveheighs one step in ${waveHeights[1]}")
+    fun testGetTimeSeriesOFLF(): Unit = runBlocking {
 
+        SurfArea.entries.map {
+            println(smackLipRepository.getTimeSeriesOFLF(it))
+        }
     }
 
-
-    @Test
-    fun testGetWaveHeightsSmackLipNordkapp() = runBlocking {
-        //henter data fra API, må sjekke i API om det stemmer
-        println(smackLipRepository.getWaveHeights(SurfArea.NORDKAPP)[0].first.toString())
-        println(smackLipRepository.getWaveHeights(SurfArea.NORDKAPP)[0].second)
-
-    }
     @Test
     fun testGetWaveHeightsSmackLipErvika() = runBlocking {
         println("Ervika:")
@@ -273,49 +269,59 @@ class ExampleUnitTest {
 
 
     @Test
-    fun testGetWindDirectionSmackLip() = runBlocking {
-        println(smackLipRepository.getWindDirection(SurfArea.FEDJE)[0].first.toString())
-        println(smackLipRepository.getWindDirection(SurfArea.FEDJE)[0].second)
+    fun testGetSymbolCode() = runBlocking{
+        println(smackLipRepository.getSymbolCode(surfArea = SurfArea.HODDEVIK))
+    }
+
+//    @Test
+//    fun testGetDataForOneDay() = runBlocking {
+//
+//        println(smackLipRepository.getDataForOneDay(20, SurfArea.HODDEVIK))
+//        println(smackLipRepository.getDataForOneDay(21, SurfArea.HODDEVIK))
+//        println(smackLipRepository.getDataForOneDay(22, SurfArea.HODDEVIK))
+//        println(smackLipRepository.getDataForOneDay(23, SurfArea.HODDEVIK))
+//    }
+
+
+//    @Test
+//    fun testGetDataFor7Days() = runBlocking {
+//        println(smackLipRepository.getDataForTheNext7Days(SurfArea.HODDEVIK))
+//    }
+
+
+    //Async calls
+
+    @Test
+    fun  testAsyncCalls(): Unit = runBlocking{
+
+       val time = measureTimeMillis { smackLipRepository.getAllOFLF7Days().forEach{
+           println(it.value.size)}}
+        println(time)
+
     }
 
     @Test
-    fun testGetWindSpeedSmackLip() = runBlocking {
-        println(smackLipRepository.getWindSpeed(SurfArea.FEDJE)[0].first.toString())
-        println(smackLipRepository.getWindSpeed(SurfArea.FEDJE)[0].second)
+    fun speedOfGetTimeseries()  = runBlocking {
+        val time2 = measureTimeMillis {
+
+            SurfArea.entries.forEach {
+                val timeseries = smackLipRepository.getTimeSeriesOFLF(it)
+                val date = LocalDate.now()
+                val xd = smackLipRepository.getOFLFOneDay(date.dayOfMonth, date.monthValue, timeseries)
+
+            }
+        }
+        val time1 = measureTimeMillis {
+            SurfArea.entries.forEach {
+                val he = smackLipRepository.getTimeSeriesOFLF(it)
+
+            }
+        }
+
+
+        println("Time1: $time1 ")
+        println("Time2: $time2 ")
+
     }
 
-
-
-    @Test
-    fun testGetWindSpeedOfGustSmackLip() = runBlocking {
-        println(smackLipRepository.getWindSpeedOfGust(SurfArea.FEDJE)[0].first.toString())
-        println(smackLipRepository.getWindSpeedOfGust(SurfArea.FEDJE)[0].second)
-    }
-
-    /*
-    @Test
-    fun testGetForecastNext24Hours() = runBlocking {
-        val tmp : MutableList<MutableList<Pair<List<Int>, Pair<Int, List<Double>>>>> = smackLipRepository.getForecastNext24Hours()
-
-        println(smackLipRepository.getForecastNext24Hours().toString())
-    }
-
-     */
-
-    /*
-    @Test
-    fun testGetDataForOneDay() = runBlocking {
-        println(smackLipRepository.getDataForOneDay(19))
-        println(smackLipRepository.getDataForOneDay(20))
-        println(smackLipRepository.getDataForOneDay(21))
-        println(smackLipRepository.getDataForOneDay(22))
-        println(smackLipRepository.getDataForOneDay(23))
-    }
-
-    @Test
-    fun testGetDataFor7Days() = runBlocking {
-        println(smackLipRepository.getDataForTheNext7Days())
-    }
-
-     */
 }
