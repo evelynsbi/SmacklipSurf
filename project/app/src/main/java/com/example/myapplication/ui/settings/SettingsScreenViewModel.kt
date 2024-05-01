@@ -20,10 +20,15 @@ data class SettingsUiState(
     val loading: Boolean = false
 )
 class SettingsScreenViewModel() : ViewModel() {
-    private val Context.settingsStore: DataStore<Settings> by dataStore(
-        fileName = "settings",
-        serializer = SettingsSerializer()
-    )
+    private lateinit var settingsStore: DataStore<Settings>
+
+    fun init(context: Context) {
+        settingsStore = context.dataStore(
+            fileName = "settings",
+            serializer = SettingsSerializer()
+        )
+    }
+
     private val settingsRepository: SettingsRepository = SettingsRepository(settingsStore)
     private var _settingsUiState = MutableStateFlow(SettingsUiState())
     val settingsUiState = _settingsUiState.asStateFlow()
