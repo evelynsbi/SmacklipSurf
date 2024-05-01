@@ -10,4 +10,7 @@ class SettingsRepository (private val settingsStore: DataStore<Settings>) {
     suspend fun setTest(test: Double) {
         settingsStore.updateData { it.toBuilder().setTest(test).build() }
     }
+    suspend fun setDarkMode(darkMode: Boolean){
+        settingsStore.updateData { it.toBuilder().setDarkMode(darkMode).build() }
+    }
 }

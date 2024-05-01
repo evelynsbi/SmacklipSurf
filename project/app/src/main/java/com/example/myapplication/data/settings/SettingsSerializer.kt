@@ -8,13 +8,13 @@ import java.io.OutputStream
 
 class SettingsSerializer: Serializer<Settings> {
     override val defaultValue: Settings
-        get() = Settings.getDefaultInstance().toBuilder().setTest(0.0).build()
+        get() = Settings.newBuilder().setTest(0.0).setDarkMode(false).build()
 
     override suspend fun readFrom(input: InputStream): Settings {
         return try {
             Settings.parseFrom(input)
         }catch (e: InvalidProtocolBufferException){
-            e.printStackTrace()
+            //e.printStackTrace()
             defaultValue
         }
     }

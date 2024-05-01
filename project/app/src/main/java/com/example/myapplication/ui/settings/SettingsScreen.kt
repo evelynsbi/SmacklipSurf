@@ -1,82 +1,80 @@
 package com.example.myapplication.ui.settings
 
 import android.annotation.SuppressLint
-import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.Settings
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SettingsScreen(settingsScreenViewmodel: SettingsScreenViewModel = viewModel()) {
-    val settingsState by settingsScreenViewmodel.settings.collectAsState(initial = Settings.getDefaultInstance())
-
+fun SettingsScreen(settingsScreenViewmodel: SettingsScreenViewModel) {
+    val settingsUiState : SettingsUiState by settingsScreenViewmodel.settingsUiState.collectAsState()
     Scaffold(
-        content ={
-            val coroutineScope = rememberCoroutineScope()
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Settings") }
+            )
+        },
+        content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
-
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Test value: ${settingsState.test}")
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+                Switch(
+                    checked = settingsUiState.darkModeEnabled,
+                    onCheckedChange = { settingsScreenViewmodel.setDarkMode(it) },
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Test value: ${settingsUiState.testValue}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                OutlinedTextField(
+                    value = settingsUiState.testValue.toString(),
+                    onValueChange = { /* Handle value change */ },
+                    label = { Text("Test Value") },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Button(
-                    onClick = {
-                        val newTestValue = 123.45
-                        settingsScreenViewmodel.saveTestValue(newTestValue)
-
-                    }
+                    onClick = { /* Handle save button click */ },
+                    modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Text(text = "update Test Value")
+                    Text(text = "Save")
                 }
-            } 
-            Text(text = "Test Value: ${settingsState.test}")
+            }
         }
     )
-    
 }
 
-@Preview(showBackground = true)
+/*
+
+@Preview
 @Composable
-private fun PreviewSettingsScreen(){
-    MyApplicationTheme {
-        SettingsScreen()
-    }
+fun previewSettingsScreen(){
+    val viewModel = SettingsScreenViewModel(settingsRepository = SettingsRepository(settingsStore = dataStore<Settings>))
+    SettingsScreen(viewModel)
 }
+
+ */
 
