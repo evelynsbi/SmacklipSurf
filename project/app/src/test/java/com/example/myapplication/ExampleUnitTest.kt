@@ -1,10 +1,15 @@
 package com.example.myapplication
 
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.Serializer
 import com.example.myapplication.data.locationForecast.LocationForecastRepositoryImpl
 import com.example.myapplication.data.metalerts.MetAlertsDataSource
 import com.example.myapplication.data.metalerts.MetAlertsRepositoryImpl
 import com.example.myapplication.data.oceanforecast.OceanforecastRepositoryImpl
+import com.example.myapplication.data.settings.SettingsRepository
+import com.example.myapplication.data.settings.SettingsSerializer
 import com.example.myapplication.data.smackLip.SmackLipRepository
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
 import com.example.myapplication.data.waveforecast.WaveForecastDataSource
@@ -17,11 +22,15 @@ import com.example.myapplication.model.oceanforecast.OceanForecast
 import com.example.myapplication.model.oceanforecast.TimeserieOF
 import com.example.myapplication.model.surfareas.SurfArea
 import com.google.gson.Gson
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.time.LocalDate
 import kotlin.system.measureTimeMillis
@@ -324,4 +333,46 @@ class ExampleUnitTest {
 
     }
 
+    //tester protobuf-filen
+
+    @Test
+    fun testSetTest() = runBlocking {
+        val settingsDataStore = createTestDataStore(SettingsSerializer())
+        val settingsRepository = SettingsRepository(settingsDataStore)
+
+        val testValue = 42.0
+
+
+        settingsRepository.setTest(testValue)
+
+        val updatedSettings = settingsRepository.settingsFlow.first()
+        assertEquals(testValue, updatedSettings.test, 0.0)
+
+
+    }
+    @Test
+    fun testSerialization() = runBlocking{
+        val settingsSerializer = SettingsSerializer()
+        val testValue = 42.0
+        val originalSettings = Settings.newBuilder().setTest(testValue).build()
+        val outputStream = ByteArrayOutputStream()
+        settingsSerializer.writeTo(originalSettings, outputStream)
+        val serializedSettings = outputStream.toByteArray()
+
+        val inputStream = ByteArrayInputStream(serializedSettings)
+        val deserializedSettings = settingsSerializer.readFrom(inputStream)
+
+        assertEquals(originalSettings, deserializedSettings)
+
+    }
+    private fun <T> createTestDataStore(serializer: Serializer<T>): DataStore<T> {
+        return DataStoreFactory.create(
+            produceFile = { error("Should not be used in tests") },
+            serializer = serializer
+        )
+    }
+
+
+
 }
+
