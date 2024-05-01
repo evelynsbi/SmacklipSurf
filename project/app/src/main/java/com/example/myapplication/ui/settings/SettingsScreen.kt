@@ -19,12 +19,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SettingsScreen(settingsScreenViewmodel: SettingsScreenViewModel) {
+fun SettingsScreen(settingsScreenViewmodel: SettingsScreenViewModel = viewModel()) {
     val settingsUiState : SettingsUiState by settingsScreenViewmodel.settingsUiState.collectAsState()
     Scaffold(
         topBar = {
@@ -67,14 +70,15 @@ fun SettingsScreen(settingsScreenViewmodel: SettingsScreenViewModel) {
     )
 }
 
-/*
 
-@Preview
+
+@Preview(showBackground = true)
 @Composable
-fun previewSettingsScreen(){
-    val viewModel = SettingsScreenViewModel(settingsRepository = SettingsRepository(settingsStore = dataStore<Settings>))
-    SettingsScreen(viewModel)
+private fun PreviewSettingsScreen(){
+    MyApplicationTheme {
+        SettingsScreen()
+    }
 }
 
- */
+
 

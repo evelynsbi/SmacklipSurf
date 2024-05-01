@@ -14,7 +14,7 @@ class SettingsSerializer: Serializer<Settings> {
         return try {
             Settings.parseFrom(input)
         }catch (e: InvalidProtocolBufferException){
-            //e.printStackTrace()
+            e.printStackTrace()
             defaultValue
         }
     }
