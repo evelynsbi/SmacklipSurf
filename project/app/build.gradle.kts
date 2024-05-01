@@ -107,6 +107,8 @@ dependencies {
     // proto data store
     implementation  ("androidx.datastore:datastore:1.0.0")
     implementation  ("com.google.protobuf:protobuf-javalite:3.21.7")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+
 
 
 }

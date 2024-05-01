@@ -13,4 +13,7 @@ class SettingsRepository (private val settingsStore: DataStore<Settings>) {
     suspend fun setDarkMode(darkMode: Boolean){
         settingsStore.updateData { it.toBuilder().setDarkMode(darkMode).build() }
     }
+    suspend fun addFavorite(favorites: String){
+        settingsStore.updateData { it.toBuilder().addFavorites(favorites).build() }
+    }
 }

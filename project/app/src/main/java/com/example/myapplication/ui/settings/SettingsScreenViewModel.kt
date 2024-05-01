@@ -1,14 +1,12 @@
 package com.example.myapplication.ui.settings
 
-import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.Settings
 import com.example.myapplication.data.settings.SettingsRepository
-import com.example.myapplication.data.settings.SettingsSerializer
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -21,19 +19,31 @@ data class SettingsUiState(
 )
 class SettingsScreenViewModel() : ViewModel() {
     private lateinit var settingsStore: DataStore<Settings>
-
-    fun init(context: Context) {
-        settingsStore = context.dataStore(
-            fileName = "settings",
-            serializer = SettingsSerializer()
-        )
-    }
-
-    private val settingsRepository: SettingsRepository = SettingsRepository(settingsStore)
+    private lateinit var settingsRepository: SettingsRepository
     private var _settingsUiState = MutableStateFlow(SettingsUiState())
     val settingsUiState = _settingsUiState.asStateFlow()
 
-    init {
+    fun init() {
+        settingsStore = createDataStore()
+        settingsRepository = SettingsRepository(settingsStore)
+        initSettings()
+
+    }
+    private fun createDataStore(): DataStore<Settings>{
+        val settings = Settings.newBuilder().setTest(0.0).setDarkMode(false).build()
+        val settingsFlow = MutableStateFlow(settings)
+        return object : DataStore<Settings> {
+            override suspend fun updateData(transform: suspend (t: Settings) -> Settings):Settings {
+                val updatedSettings = transform(settingsFlow.value)
+                settingsFlow.value = updatedSettings
+                return updatedSettings
+            }
+
+            override val data: Flow<Settings> = settingsFlow
+        }
+
+    }
+    private fun initSettings(){
         viewModelScope.launch {
             try {
                 val settings = settingsRepository.settingsFlow.first()

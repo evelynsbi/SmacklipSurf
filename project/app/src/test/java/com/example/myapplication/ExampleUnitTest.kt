@@ -392,5 +392,14 @@ class ExampleUnitTest {
         assertEquals(originalSettings, deserializedSettings)
 
     }
+
+    @Test
+    fun testAddFavorite() = runBlocking {
+        val favorite = "HODDEVIK"
+        settingsRepository.addFavorite(favorite)
+
+        val updatedSettings = settingsStore.data.first()
+        assertTrue(updatedSettings.favoritesList.contains(favorite))
+    }
 }
 
