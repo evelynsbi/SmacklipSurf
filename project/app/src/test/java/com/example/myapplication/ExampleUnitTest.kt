@@ -2,8 +2,6 @@ package com.example.myapplication
 
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.core.DataStoreFactory
-import androidx.datastore.core.Serializer
 import com.example.myapplication.data.locationForecast.LocationForecastRepositoryImpl
 import com.example.myapplication.data.metalerts.MetAlertsDataSource
 import com.example.myapplication.data.metalerts.MetAlertsRepositoryImpl
@@ -26,8 +24,11 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -334,21 +335,47 @@ class ExampleUnitTest {
     }
 
     //tester protobuf-filen
+    private lateinit var settingsStore: DataStore<Settings>
+    private lateinit var settingsRepository: SettingsRepository
+
+    @Before
+    fun setUp(){
+        settingsStore = createDataStore()
+        settingsRepository = SettingsRepository(settingsStore)
+    }
+    private fun createDataStore(): DataStore<Settings>{
+        val settings = Settings.newBuilder().setTest(0.0).setDarkMode(false).build()
+        val settingsFlow = MutableStateFlow(settings)
+        return object : DataStore<Settings> {
+            override suspend fun updateData(transform: suspend (t: Settings) -> Settings):Settings {
+                val updatedSettings = transform(settingsFlow.value)
+                settingsFlow.value = updatedSettings
+                return updatedSettings
+            }
+
+            override val data: Flow<Settings> = settingsFlow
+        }
+
+    }
+
+
 
     @Test
     fun testSetTest() = runBlocking {
-        val settingsDataStore = createTestDataStore(SettingsSerializer())
-        val settingsRepository = SettingsRepository(settingsDataStore)
-
-        val testValue = 42.0
-
-
+        val testValue = 10.0
         settingsRepository.setTest(testValue)
 
-        val updatedSettings = settingsRepository.settingsFlow.first()
+        val updatedSettings = settingsStore.data.first()
         assertEquals(testValue, updatedSettings.test, 0.0)
+    }
 
+    @Test
+    fun testSetDarkMode() = runBlocking{
+        val darkModeValue = true
+        settingsRepository.setDarkMode(darkModeValue)
 
+        val updatedSettings = settingsStore.data.first()
+        assertEquals(darkModeValue, updatedSettings.darkMode)
     }
     @Test
     fun testSerialization() = runBlocking{
@@ -365,14 +392,5 @@ class ExampleUnitTest {
         assertEquals(originalSettings, deserializedSettings)
 
     }
-    private fun <T> createTestDataStore(serializer: Serializer<T>): DataStore<T> {
-        return DataStoreFactory.create(
-            produceFile = { error("Should not be used in tests") },
-            serializer = serializer
-        )
-    }
-
-
-
 }
 
