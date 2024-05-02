@@ -7,6 +7,7 @@ import com.example.myapplication.data.metalerts.MetAlertsDataSource
 import com.example.myapplication.data.metalerts.MetAlertsRepositoryImpl
 import com.example.myapplication.data.oceanforecast.OceanforecastRepositoryImpl
 import com.example.myapplication.data.settings.SettingsRepository
+import com.example.myapplication.data.settings.SettingsRepositoryImpl
 import com.example.myapplication.data.settings.SettingsSerializer
 import com.example.myapplication.data.smackLip.SmackLipRepository
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
@@ -341,7 +342,7 @@ class ExampleUnitTest {
     @Before
     fun setUp(){
         settingsStore = createDataStore()
-        settingsRepository = SettingsRepository(settingsStore)
+        settingsRepository = SettingsRepositoryImpl(settingsStore)
     }
     private fun createDataStore(): DataStore<Settings>{
         val settings = Settings.newBuilder().setTest(0.0).setDarkMode(false).build()
@@ -396,10 +397,10 @@ class ExampleUnitTest {
     @Test
     fun testAddFavorite() = runBlocking {
         val favorite = "HODDEVIK"
-        settingsRepository.addFavorite(favorite)
+        settingsRepository.addFavoriteSurfArea(favorite)
 
         val updatedSettings = settingsStore.data.first()
-        assertTrue(updatedSettings.favoritesList.contains(favorite))
+        assertTrue(updatedSettings.favoriteSurfAreasList.contains(favorite))
     }
 }
 
