@@ -1,5 +1,6 @@
 package com.example.myapplication.data.settings
 
+import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.example.myapplication.Settings
 import com.google.protobuf.InvalidProtocolBufferException
@@ -7,19 +8,17 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class SettingsSerializer: Serializer<Settings> {
-    override val defaultValue: Settings
-        get() = Settings.newBuilder().setTest(0.0).setDarkMode(false).build()
+    override val defaultValue: Settings = Settings.getDefaultInstance()
 
     override suspend fun readFrom(input: InputStream): Settings {
-        return try {
-            Settings.parseFrom(input)
+        try {
+            return Settings.parseFrom(input)
         }catch (e: InvalidProtocolBufferException){
-            e.printStackTrace()
-            defaultValue
+            throw CorruptionException("Cannot read proto,", e)
         }
     }
 
-    override suspend fun writeTo(t: Settings, output: OutputStream) {
+    override suspend fun writeTo(t: Settings, output: OutputStream ) {
         t.writeTo(output)
     }
 }

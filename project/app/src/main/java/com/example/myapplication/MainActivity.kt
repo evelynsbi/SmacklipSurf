@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
+import androidx.datastore.preferences.core.Preferences
+//import androidx.datastore.preferences.createDataStore
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -71,7 +73,8 @@ fun SmackLipNavigation(){
         composable("BottomBar"){
             BottomBar(
                 onNavigateToMapScreen = { navController.navigate("MapScreen")},
-                onNavigateToHomeScreen = {navController.navigate("HomeScreen")}
+                onNavigateToHomeScreen = {navController.navigate("HomeScreen")},
+                onNavigateToSettingsScreen = {navController.navigate("SettingsScreen")}
             )
         }
         composable("MapScreen"){

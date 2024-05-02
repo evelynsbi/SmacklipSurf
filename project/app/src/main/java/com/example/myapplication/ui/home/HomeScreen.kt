@@ -100,6 +100,10 @@ fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNaviga
                 onNavigateToMapScreen = {
                     navController?.navigate("MapScreen")
                     // Navigerer til MapScreen
+                },
+                onNavigateToSettingsScreen = {
+                    navController?.navigate("SettingsScreen")
+                    // Navigerer til SettingsScreen
                 }
             )
         }
