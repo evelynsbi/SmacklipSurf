@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.surfarea
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy
+import kotlin.text.Typography.times
 
 data class DailySurfAreaScreenUiState(
     val location: SurfArea? = null,
@@ -34,20 +36,23 @@ class DailySurfAreaScreenViewModel: ViewModel() {
     private val _dailySurfAreaScreenUiState = MutableStateFlow(DailySurfAreaScreenUiState())
     val dailySurfAreaScreenUiState: StateFlow<DailySurfAreaScreenUiState> = _dailySurfAreaScreenUiState.asStateFlow()
 
-    // TODO: test usage
     fun updateStatusConditions(surfArea: SurfArea, forecast: List<Map<List<Int>, List<Any>>>) {
         viewModelScope.launch(Dispatchers.IO) {
 
             _dailySurfAreaScreenUiState.update {state ->
+                Log.d("DSVM", "Updating statuses")
                 val newConditionStatuses: MutableList<Map<List<Int>, ConditionStatus>> = mutableListOf()
                 if (forecast.isEmpty()) {
+                    Log.d("DSVM", "Forecast empty, quitting update")
                     return@launch
                 }
 
                 forecast.map {dayMap ->
                     val todaysStatuses: MutableMap<List<Int>, ConditionStatus> = mutableMapOf()
+
                     dayMap.entries.map {(time, data) ->
-                        val wavePeriod = try{state.wavePeriods[0]} catch (e: IndexOutOfBoundsException) {null} //TODO: change to logical wavePeriod
+                        val wavePeriod = try{state.wavePeriods[forecast.indexOf(dayMap) * time[3]]}
+                        catch (e: IndexOutOfBoundsException) {null}
                         val conditionStatus = smackLipRepository.getConditionStatus(
                             location = surfArea,
                             wavePeriod = wavePeriod,
@@ -78,7 +83,11 @@ class DailySurfAreaScreenViewModel: ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             //starte loading screen - det første som kalles fra DailySurfScreen
             _dailySurfAreaScreenUiState.update {
-                it.copy(loading = true)
+                if (surfArea == it.location) {
+                    Log.d("DSVM", "Data already updated for $surfArea")
+                    return@launch
+                }
+                it.copy(loading = true, location = surfArea)
             }
             _dailySurfAreaScreenUiState.update {state ->
                 val newForecast7Days: List<Map<List<Int>, List<Any>>> = smackLipRepository.getSurfAreaOFLFNext7Days(surfArea)
@@ -95,6 +104,10 @@ class DailySurfAreaScreenViewModel: ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
 
             _dailySurfAreaScreenUiState.update {
+                if (surfArea == it.location && it.wavePeriods.isNotEmpty()) {
+                    Log.d("DSVM", "Waveperiods already updated for $surfArea")
+                    return@launch
+                }
                 val newWavePeriods = smackLipRepository.getWavePeriodsNext3DaysForArea(surfArea)
                 it.copy(wavePeriods = newWavePeriods)
             }
