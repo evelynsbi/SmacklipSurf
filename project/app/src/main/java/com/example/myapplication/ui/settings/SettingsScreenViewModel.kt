@@ -22,8 +22,6 @@ sealed class SettingsUiState{
 
 class SettingsScreenViewModel(
     private val container: AppContainer,
-    //private val savedStateHandle: SavedStateHandle,
-    //private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val _settingsUiState: MutableStateFlow<SettingsUiState> =
         MutableStateFlow(SettingsUiState.Loading)

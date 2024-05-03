@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.AppContainer
 import com.example.myapplication.R
 import com.example.myapplication.Settings
-import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
 import com.example.myapplication.model.metalerts.Alert
 import com.example.myapplication.model.smacklip.AllSurfAreasOFLF
 import com.example.myapplication.model.smacklip.DataAtTime
@@ -30,9 +29,9 @@ data class HomeScreenUiState(
 )
 
 class HomeScreenViewModel(
-    container: AppContainer
+    private val container: AppContainer
 ) : ViewModel() {
-    private val smackLipRepository = SmackLipRepositoryImpl()
+    //private val smackLipRepository = SmackLipRepositoryImpl()
     private val _homeScreenUiState = MutableStateFlow(HomeScreenUiState())
     private val _favoriteSurfAreas = MutableStateFlow<List<SurfArea>>(emptyList())
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
@@ -52,7 +51,7 @@ class HomeScreenViewModel(
                     Log.d("HSVM", "Quitting 'updateOFLF', data already loaded")
                     return@launch
                 }
-                val allNext7Days: AllSurfAreasOFLF = smackLipRepository.getAllOFLF7Days()
+                val allNext7Days: AllSurfAreasOFLF = container.smackLipRepository.getAllOFLF7Days()
 
                 val newOfLfNow: Map<SurfArea, DataAtTime> = allNext7Days.next7Days.entries.associate {(sa, forecast7Days) ->
                     val times = forecast7Days.forecast[0].data.keys.sortedWith(
@@ -77,7 +76,7 @@ class HomeScreenViewModel(
                 it.copy(loading = true)
             }
             val allAlerts = SurfArea.entries.associateWith {
-                smackLipRepository.getRelevantAlertsFor(it)
+                container.smackLipRepository.getRelevantAlertsFor(it)
             }
             _homeScreenUiState.update {
                 it.copy(
