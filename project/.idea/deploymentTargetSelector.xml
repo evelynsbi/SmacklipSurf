@@ -16,7 +16,7 @@
       <SelectionState runConfigName="MainActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewHomeScreen">
+      <SelectionState runConfigName="PreviewSettingsScreen">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

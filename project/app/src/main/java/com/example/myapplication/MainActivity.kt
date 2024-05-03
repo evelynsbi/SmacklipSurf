@@ -1,7 +1,7 @@
 package com.example.myapplication
 
+//import androidx.datastore.preferences.createDataStore
 import DailySurfAreaScreen
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,17 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
-import androidx.datastore.preferences.core.Preferences
-//import androidx.datastore.preferences.createDataStore
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.data.settings.SettingsSerializer
 import com.example.myapplication.presentation.viewModelFactory
 import com.example.myapplication.ui.home.HomeScreen
 import com.example.myapplication.ui.home.HomeScreenViewModel
@@ -38,7 +33,6 @@ import com.example.myapplication.ui.settings.SettingsScreenViewModel
 import com.example.myapplication.ui.surfarea.DailySurfAreaScreenViewModel
 import com.example.myapplication.ui.surfarea.SurfAreaScreen
 import com.example.myapplication.ui.theme.AppTheme
-
 
 
 //TODO: vm skal ikke være sånn! Må ha en viewmodel factory, men slashscreen må ha tilgang på en viewmodel
@@ -52,6 +46,8 @@ class MainActivity : ComponentActivity() {
         homeViewModelFactory = HomeScreenViewModel.HomeScreenViewModelFactory(appContainer)
         val viewModelFactory = SettingsScreenViewModel.SettingsViewModelFactory(appContainer)
 
+        val settingsScreenViewModel: SettingsScreenViewModel by viewModels {viewModelFactory}
+
         val homeScreenViewModel: HomeScreenViewModel by viewModels { homeViewModelFactory }
         installSplashScreen().apply {
             setKeepOnScreenCondition{
@@ -60,7 +56,8 @@ class MainActivity : ComponentActivity() {
         }
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
         setContent {
-            AppTheme {
+            val isDarkTheme by settingsScreenViewModel.isDarkThemEnabled.collectAsState(initial = false)
+            AppTheme( darkTheme = isDarkTheme) {
                 val isConnected by connectivityObserver.observe().collectAsState(
                     initial = false
                 )
