@@ -1,9 +1,23 @@
 syntax = "proto3";
 option java_package = "com.example.myapplication";
 option java_multiple_files = true;
+/*
+message SurfAreaFavorites{
+  string locationName = 1;
+  string areaName = 2;
+  double lat = 3;
+  double lon = 4;
+  int32 image = 5;
+  double optimalWaveDir = 6;
+  double optimalWindDir = 7;
+  int32 description = 8;
+  string modelName = 9;
+  int32 pointId = 10;
+}
 
+ */
 message Settings {
   double test = 1;
   bool darkMode = 2;
-  repeated string favoriteSurfAreas = 3;
+  repeated string favoriteSurfAreaNames = 3;
 }
