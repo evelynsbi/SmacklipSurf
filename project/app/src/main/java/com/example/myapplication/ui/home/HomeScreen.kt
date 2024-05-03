@@ -1,5 +1,7 @@
 package com.example.myapplication.ui.home
 
+//import com.example.myapplication.ui.theme.MyApplicationTheme
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,6 +56,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -63,22 +66,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.NavigationManager
 import com.example.myapplication.R
+import com.example.myapplication.SmackLipApplication
 import com.example.myapplication.model.metalerts.Alert
-import com.example.myapplication.model.metalerts.Properties
 import com.example.myapplication.model.smacklip.DataAtTime
 import com.example.myapplication.model.surfareas.SurfArea
 import com.example.myapplication.ui.common.composables.BottomBar
 import com.example.myapplication.ui.theme.AppTheme
-
-//import com.example.myapplication.ui.theme.MyApplicationTheme
-
 import com.example.myapplication.ui.theme.AppTypography
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(homeScreenViewModel : HomeScreenViewModel = viewModel(), onNavigateToSurfAreaScreen: (String) -> Unit = {}){
+fun HomeScreen(homeScreenViewModelFactory: HomeScreenViewModel.HomeScreenViewModelFactory, onNavigateToSurfAreaScreen: (String) -> Unit = {}){
+    val homeScreenViewModel : HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
     val homeScreenUiState: HomeScreenUiState by homeScreenViewModel.homeScreenUiState.collectAsState()
     val favoriteSurfAreas by homeScreenViewModel.favoriteSurfAreas.collectAsState()
     val isSearchActive = remember { mutableStateOf(false) }
@@ -532,6 +532,7 @@ fun SurfAreaCard(
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 private fun PreviewSurfAreaCard() {
@@ -557,10 +558,19 @@ private fun PreviewSurfAreaCard() {
     }
 }
 
+ */
+
 @Preview(showBackground = true)
 @Composable
 private fun PreviewHomeScreen() {
     AppTheme {
-        HomeScreen(){}
+        val context = LocalContext.current
+        val viewModelFactory = remember {
+            HomeScreenViewModel.HomeScreenViewModelFactory(
+                (context.applicationContext as SmackLipApplication).container
+            )
+        }
+        HomeScreen(viewModelFactory)
+
     }
 }

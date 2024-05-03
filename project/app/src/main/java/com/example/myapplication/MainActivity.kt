@@ -5,6 +5,7 @@ import DailySurfAreaScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,15 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.data.settings.SettingsSerializer
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.common.composables.BottomBar
 import com.example.myapplication.ui.home.HomeScreen
 import com.example.myapplication.ui.home.HomeScreenViewModel
 import com.example.myapplication.ui.map.MapScreen
@@ -36,25 +32,27 @@ import com.example.myapplication.ui.settings.SettingsScreenViewModel
 import com.example.myapplication.ui.surfarea.DailySurfAreaScreenViewModel
 import com.example.myapplication.ui.surfarea.SurfAreaScreen
 import com.example.myapplication.ui.theme.AppTheme
-import kotlinx.coroutines.delay
 
 
 //TODO: vm skal ikke være sånn! Må ha en viewmodel factory, men slashscreen må ha tilgang på en viewmodel
-val homeScreenViewModel = HomeScreenViewModel()
 
 
 class MainActivity : ComponentActivity() {
+    private lateinit var homeViewModelFactory: HomeScreenViewModel.HomeScreenViewModelFactory
+    //private lateinit var viewModelFactory: SettingsScreenViewModel.SettingsViewModelFactory
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val appContainer =(application as SmackLipApplication).container
+
+        homeViewModelFactory = HomeScreenViewModel.HomeScreenViewModelFactory(appContainer)
+        val viewModelFactory = SettingsScreenViewModel.SettingsViewModelFactory(appContainer, SavedStateHandle())
+        val homeScreenViewModel: HomeScreenViewModel by viewModels { homeViewModelFactory }
         installSplashScreen().apply {
             setKeepOnScreenCondition{
                 homeScreenViewModel.homeScreenUiState.value.loading
             }
         }
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
-        val viewModelFactory = SettingsScreenViewModel.SettingsViewModelFactory(
-            (application as SmackLipApplication).container, SavedStateHandle()
-        )
         setContent {
             AppTheme {
                 val isConnected by connectivityObserver.observe().collectAsState(
@@ -66,11 +64,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     if (isConnected) {
-                        SmackLipNavigation(viewModelFactory)
+                        SmackLipNavigation(viewModelFactory, homeViewModelFactory)
                     }else{
                         ShowSnackBar()
                         if (isConnected) {
-                            SmackLipNavigation(viewModelFactory)
+                            SmackLipNavigation(viewModelFactory, homeViewModelFactory)
                         }
                     }
 
@@ -97,7 +95,7 @@ fun ShowSnackBar() {
 }
 
 @Composable
-fun SmackLipNavigation(viewModelFactory: SettingsScreenViewModel.SettingsViewModelFactory){
+fun SmackLipNavigation(viewModelFactory: SettingsScreenViewModel.SettingsViewModelFactory, homeViewModelFactory: HomeScreenViewModel.HomeScreenViewModelFactory){
     val navController = rememberNavController()
     NavigationManager.navController = navController
     val dsvm = DailySurfAreaScreenViewModel()
@@ -107,7 +105,7 @@ fun SmackLipNavigation(viewModelFactory: SettingsScreenViewModel.SettingsViewMod
 
         ){
         composable("HomeScreen"){
-            HomeScreen(){
+            HomeScreen(homeViewModelFactory){
                 navController.navigate("SurfAreaScreen/$it")
             }
         }
