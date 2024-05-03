@@ -13,5 +13,7 @@ class SmackLipApplication: Application() {
 
     override fun onTerminate() {
         super.onTerminate()
+        container = DefaultAppContainer(applicationContext)
     }
+
 }

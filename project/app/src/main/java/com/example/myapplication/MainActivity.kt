@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,13 +38,13 @@ import com.example.myapplication.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
     private lateinit var homeViewModelFactory: HomeScreenViewModel.HomeScreenViewModelFactory
-    //private lateinit var viewModelFactory: SettingsScreenViewModel.SettingsViewModelFactory
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appContainer =(application as SmackLipApplication).container
 
+        val appContainer =(application as SmackLipApplication).container
         homeViewModelFactory = HomeScreenViewModel.HomeScreenViewModelFactory(appContainer)
-        val viewModelFactory = SettingsScreenViewModel.SettingsViewModelFactory(appContainer, SavedStateHandle())
+        val viewModelFactory = SettingsScreenViewModel.SettingsViewModelFactory(appContainer)
+
         val homeScreenViewModel: HomeScreenViewModel by viewModels { homeViewModelFactory }
         installSplashScreen().apply {
             setKeepOnScreenCondition{
@@ -58,6 +57,16 @@ class MainActivity : ComponentActivity() {
                 val isConnected by connectivityObserver.observe().collectAsState(
                     initial = false
                 )
+                //foreløpig kommentert ut
+                /*
+                val viewModel = viewModel<SettingsScreenViewModel>(
+                    factory = viewModelFactory{
+                        SettingsScreenViewModel(SmackLipApplication.container.smackLipRepository)
+                    }
+                )
+                 */
+
+
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

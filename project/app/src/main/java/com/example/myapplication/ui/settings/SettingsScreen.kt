@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -200,8 +199,8 @@ private fun PreviewSettingsScreen(){
         val context = LocalContext.current
         val viewModelFactory = remember {
             SettingsScreenViewModel.SettingsViewModelFactory(
-                (context.applicationContext as SmackLipApplication).container, SavedStateHandle()
-            )
+                (context.applicationContext as SmackLipApplication).container)
+
         }
         SettingsScreen(navController = rememberNavController(), viewModelFactory)
 

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.AppContainer
 import com.example.myapplication.R
 import com.example.myapplication.Settings
-import com.example.myapplication.data.settings.SettingsRepository
 import com.example.myapplication.data.smackLip.SmackLipRepositoryImpl
 import com.example.myapplication.model.metalerts.Alert
 import com.example.myapplication.model.smacklip.AllSurfAreasOFLF
@@ -30,13 +29,15 @@ data class HomeScreenUiState(
     val loading: Boolean = true
 )
 
-class HomeScreenViewModel(settingsRepository: SettingsRepository) : ViewModel() {
+class HomeScreenViewModel(
+    container: AppContainer
+) : ViewModel() {
     private val smackLipRepository = SmackLipRepositoryImpl()
     private val _homeScreenUiState = MutableStateFlow(HomeScreenUiState())
     private val _favoriteSurfAreas = MutableStateFlow<List<SurfArea>>(emptyList())
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
     val favoriteSurfAreas: StateFlow<List<SurfArea>> = _favoriteSurfAreas // TODO: asStateFlow()?
-    val settings: Flow<Settings> = settingsRepository.settingsFlow
+    val settings: Flow<Settings> = container.settingsRepository.settingsFlow
 
 
     init {
@@ -128,7 +129,7 @@ class HomeScreenViewModel(settingsRepository: SettingsRepository) : ViewModel() 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(HomeScreenViewModel::class.java)){
                 @Suppress("UNCHECKED_CAST")
-                return HomeScreenViewModel(appContainer.settingsRepository) as T
+                return HomeScreenViewModel(appContainer) as T
             }
             throw IllegalArgumentException("Unknown ViewModel Class")
         }
