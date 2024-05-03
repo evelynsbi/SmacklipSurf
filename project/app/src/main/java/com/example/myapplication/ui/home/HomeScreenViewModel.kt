@@ -31,11 +31,10 @@ data class HomeScreenUiState(
 class HomeScreenViewModel(
     private val container: AppContainer
 ) : ViewModel() {
-    //private val smackLipRepository = SmackLipRepositoryImpl()
     private val _homeScreenUiState = MutableStateFlow(HomeScreenUiState())
     private val _favoriteSurfAreas = MutableStateFlow<List<SurfArea>>(emptyList())
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
-    val favoriteSurfAreas: StateFlow<List<SurfArea>> = _favoriteSurfAreas.asStateFlow() // TODO: asStateFlow()?
+    val favoriteSurfAreas: StateFlow<List<SurfArea>> = _favoriteSurfAreas
     val settings: Flow<Settings> = container.settingsRepository.settingsFlow
 
 
@@ -154,12 +153,14 @@ class HomeScreenViewModel(
             R.drawable.empty_star_icon
         }
     }
+
     fun clearAllFavorites(){
         viewModelScope.launch {
             container.settingsRepository.clearFavoriteSurfAreas()
             _favoriteSurfAreas.value = emptyList()
         }
     }
+
     class HomeScreenViewModelFactory(
         private val appContainer: AppContainer
     ) : ViewModelProvider.Factory{
