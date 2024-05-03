@@ -18,8 +18,7 @@ object SettingsSerializer: Serializer<Settings> {
         }
     }
 
-    override suspend fun writeTo(
-        t: Settings,
-        output: OutputStream
-    ) = t.writeTo(output)
+    override suspend fun writeTo(t: Settings, output: OutputStream ) {
+        t.writeTo(output)
+    }
 }

@@ -37,12 +37,12 @@ import com.example.myapplication.ui.theme.AppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
+//@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-
 fun SettingsScreen(navController: NavController, settingsViewmodelFactory: SettingsScreenViewModel.SettingsViewModelFactory) {
     val settingsScreenViewModel : SettingsScreenViewModel = viewModel(factory = settingsViewmodelFactory)
     val settingsUiState by settingsScreenViewModel.settingsUiState.collectAsState()
-    val navController = NavigationManager.navController
+    //val navController = NavigationManager.navController
 
     Scaffold(
         topBar = {
@@ -86,7 +86,7 @@ fun SettingsScreen(navController: NavController, settingsViewmodelFactory: Setti
                             }
                         )
                     }
-                    /*item {
+                    item {
                         TestValueCard(
                             testValue = currentState.settings.test,
                             onTestValueChanged = { value ->
@@ -96,8 +96,6 @@ fun SettingsScreen(navController: NavController, settingsViewmodelFactory: Setti
 
                         )
                     }
-
-                     */
                     item {
                         InfoCardSettings()
                     }
@@ -109,8 +107,6 @@ fun SettingsScreen(navController: NavController, settingsViewmodelFactory: Setti
                         )
                     }
                 }
-
-                else -> {}
             }
         }
 
@@ -203,11 +199,8 @@ private fun PreviewSettingsScreen(){
 
         }
         SettingsScreen(navController = rememberNavController(), viewModelFactory)
-
     }
-
 }
-
 
 
 

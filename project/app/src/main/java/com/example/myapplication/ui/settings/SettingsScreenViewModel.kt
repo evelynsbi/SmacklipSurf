@@ -5,21 +5,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.AppContainer
 import com.example.myapplication.Settings
+import com.example.myapplication.data.settings.SettingsRepositoryImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
-//val Context.settingsDataStore: DataStore<Settings> by preferencesDataStore()
-
 sealed class SettingsUiState{
     object Loading : SettingsUiState()
     data class Loaded(val settings: Settings): SettingsUiState()
     data class Error(val message: String): SettingsUiState()
 }
-
 class SettingsScreenViewModel(
     private val container: AppContainer,
 ) : ViewModel() {
@@ -27,6 +24,7 @@ class SettingsScreenViewModel(
         MutableStateFlow(SettingsUiState.Loading)
     val settingsUiState: StateFlow<SettingsUiState> = _settingsUiState.asStateFlow()
     val settings: Flow<Settings> = container.settingsRepository.settingsFlow
+
     init {
         viewModelScope.launch {
             container.settingsRepository.settingsFlow.collect{
@@ -34,7 +32,6 @@ class SettingsScreenViewModel(
             }
         }
     }
-
 
     /*
     //test med midlertidig datastore
@@ -94,6 +91,7 @@ class SettingsScreenViewModel(
         }
     }
 
+
     class SettingsViewModelFactory(
         private val appContainer: AppContainer
     ) : ViewModelProvider.Factory{
@@ -105,6 +103,6 @@ class SettingsScreenViewModel(
             throw IllegalArgumentException("Unknown ViewModel Class")
         }
     }
+
+
 }
-
-
