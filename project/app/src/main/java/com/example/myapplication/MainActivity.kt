@@ -15,6 +15,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import com.example.myapplication.ui.surfarea.DailySurfAreaScreenViewModel
 import com.example.myapplication.ui.surfarea.SurfAreaScreen
 import com.example.myapplication.ui.surfarea.SurfAreaScreenViewModel
 import com.example.myapplication.ui.theme.AppTheme
+import com.example.myapplication.ui.theme.LocalDarkTheme
 
 
 //TODO: vm skal ikke være sånn! Må ha en viewmodel factory, men slashscreen må ha tilgang på en viewmodel
@@ -48,21 +50,15 @@ class MainActivity : ComponentActivity() {
         }
 
 
+
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
         setContent {
 
-            val settingsVm = viewModel<SettingsScreenViewModel>(
-                factory = viewModelFactory {
-                    SettingsScreenViewModel(SmackLipApplication.container)
-                }
-            )
-            val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
 
-            AppTheme( darkTheme = isDarkTheme) {
+            AppTheme( darkTheme = LocalDarkTheme.current) {
                 val isConnected by connectivityObserver.observe().collectAsState(
                     initial = false
                 )
-
 
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -82,17 +78,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-}
-
-@Composable
-fun AppTheme(){
-    val settingsVm = viewModel<SettingsScreenViewModel>(
-        factory = viewModelFactory {
-            SettingsScreenViewModel(SmackLipApplication.container)
-        }
-    )
-    val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
 
 }
 
@@ -133,6 +118,10 @@ fun SmackLipNavigation(){
             SettingsScreenViewModel(SmackLipApplication.container)
         }
     )
+    val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
+    CompositionLocalProvider(LocalDarkTheme provides isDarkTheme ) {
+
+    }
     val savm = viewModel<SurfAreaScreenViewModel>(
         factory = viewModelFactory {
             SurfAreaScreenViewModel(SmackLipApplication.container.stateFulRepo)
