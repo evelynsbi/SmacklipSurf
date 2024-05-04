@@ -1,11 +1,11 @@
 package com.example.myapplication
 
 //import androidx.datastore.preferences.createDataStore
+
 import DailySurfAreaScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,43 +32,36 @@ import com.example.myapplication.ui.settings.SettingsScreen
 import com.example.myapplication.ui.settings.SettingsScreenViewModel
 import com.example.myapplication.ui.surfarea.DailySurfAreaScreenViewModel
 import com.example.myapplication.ui.surfarea.SurfAreaScreen
+import com.example.myapplication.ui.surfarea.SurfAreaScreenViewModel
 import com.example.myapplication.ui.theme.AppTheme
 
 
 //TODO: vm skal ikke være sånn! Må ha en viewmodel factory, men slashscreen må ha tilgang på en viewmodel
 
 class MainActivity : ComponentActivity() {
-    private lateinit var homeViewModelFactory: HomeScreenViewModel.HomeScreenViewModelFactory
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val appContainer =(application as SmackLipApplication).container
-        homeViewModelFactory = HomeScreenViewModel.HomeScreenViewModelFactory(appContainer)
-        val viewModelFactory = SettingsScreenViewModel.SettingsViewModelFactory(appContainer)
-
-        val settingsScreenViewModel: SettingsScreenViewModel by viewModels {viewModelFactory}
-
-        val homeScreenViewModel: HomeScreenViewModel by viewModels { homeViewModelFactory }
         installSplashScreen().apply {
             setKeepOnScreenCondition{
-                homeScreenViewModel.homeScreenUiState.value.loading
+                SmackLipApplication.container.stateFulRepo.ofLfNext7Days.value.next7Days.isEmpty()
             }
         }
+
+
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
         setContent {
-            val isDarkTheme by settingsScreenViewModel.isDarkThemEnabled.collectAsState(initial = false)
+
+            val settingsVm = viewModel<SettingsScreenViewModel>(
+                factory = viewModelFactory {
+                    SettingsScreenViewModel(SmackLipApplication.container)
+                }
+            )
+            val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
+
             AppTheme( darkTheme = isDarkTheme) {
                 val isConnected by connectivityObserver.observe().collectAsState(
                     initial = false
                 )
-                //foreløpig kommentert ut
-                /*
-                val viewModel = viewModel<SettingsScreenViewModel>(
-                    factory = viewModelFactory{
-                        SettingsScreenViewModel(SmackLipApplication.container.smackLipRepository)
-                    }
-                )
-                 */
 
 
                 // A surface container using the 'background' color from the theme
@@ -77,11 +70,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     if (isConnected) {
-                        SmackLipNavigation(viewModelFactory, homeViewModelFactory)
+                        SmackLipNavigation()
                     }else{
                         ShowSnackBar()
                         if (isConnected) {
-                            SmackLipNavigation(viewModelFactory, homeViewModelFactory)
+                            SmackLipNavigation()
                         }
                     }
                 }
@@ -89,6 +82,17 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+}
+
+@Composable
+fun AppTheme(){
+    val settingsVm = viewModel<SettingsScreenViewModel>(
+        factory = viewModelFactory {
+            SettingsScreenViewModel(SmackLipApplication.container)
+        }
+    )
+    val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
 
 }
 
@@ -108,12 +112,30 @@ fun ShowSnackBar() {
 }
 
 @Composable
-fun SmackLipNavigation(viewModelFactory: SettingsScreenViewModel.SettingsViewModelFactory, homeViewModelFactory: HomeScreenViewModel.HomeScreenViewModelFactory){
+fun SmackLipNavigation(){
     val navController = rememberNavController()
     NavigationManager.navController = navController
+
     val dsvm = viewModel<DailySurfAreaScreenViewModel>(
         factory = viewModelFactory {
             DailySurfAreaScreenViewModel() // send med argument
+        }
+    )
+
+    val hsvm = viewModel<HomeScreenViewModel>(
+        factory = viewModelFactory {
+            HomeScreenViewModel(SmackLipApplication.container.stateFulRepo)
+        }
+    )
+
+    val settingsVm = viewModel<SettingsScreenViewModel>(
+        factory = viewModelFactory {
+            SettingsScreenViewModel(SmackLipApplication.container)
+        }
+    )
+    val savm = viewModel<SurfAreaScreenViewModel>(
+        factory = viewModelFactory {
+            SurfAreaScreenViewModel(SmackLipApplication.container.stateFulRepo)
         }
     )
 
@@ -123,13 +145,14 @@ fun SmackLipNavigation(viewModelFactory: SettingsScreenViewModel.SettingsViewMod
 
         ){
         composable("HomeScreen"){
-            HomeScreen(homeViewModelFactory){
+            HomeScreen(hsvm){
+
                 navController.navigate("SurfAreaScreen/$it")
             }
         }
         composable("SurfAreaScreen/{surfArea}") { backStackEntry ->
             val surfArea = backStackEntry.arguments?.getString("surfArea") ?: ""
-            SurfAreaScreen(surfAreaName = surfArea)
+            SurfAreaScreen(surfAreaName = surfArea, savm)
         }
         composable("DailySurfAreaScreen/{surfArea}/{dayIndex}") { backStackEntry ->
             val surfArea = backStackEntry.arguments?.getString("surfArea") ?: ""
@@ -146,7 +169,7 @@ fun SmackLipNavigation(viewModelFactory: SettingsScreenViewModel.SettingsViewMod
             )
         }
         composable("SettingsScreen") {
-            SettingsScreen(navController = navController, viewModelFactory)
+            SettingsScreen(navController = navController, settingsVm)
         }
     }
 }

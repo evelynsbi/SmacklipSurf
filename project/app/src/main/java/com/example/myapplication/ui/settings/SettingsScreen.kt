@@ -40,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.R
 import com.example.myapplication.Settings
 import com.example.myapplication.SmackLipApplication
+import com.example.myapplication.presentation.viewModelFactory
 import com.example.myapplication.ui.common.composables.BottomBar
 import com.example.myapplication.ui.theme.AppTheme
 
@@ -47,8 +48,7 @@ import com.example.myapplication.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 //@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SettingsScreen(navController: NavController, settingsViewmodelFactory: SettingsScreenViewModel.SettingsViewModelFactory) {
-    val settingsScreenViewModel : SettingsScreenViewModel = viewModel(factory = settingsViewmodelFactory)
+fun SettingsScreen(navController: NavController, settingsScreenViewModel: SettingsScreenViewModel) {
     val settingsUiState by settingsScreenViewModel.settingsUiState.collectAsState()
     val isDarkThemeEnabled by settingsScreenViewModel.isDarkThemEnabled.collectAsState()
     //val navController = NavigationManager.navController
@@ -178,70 +178,38 @@ fun InformationCard(title: String, content: String) {
 
 }
 
-@Composable
-fun DarkModeCard(
-    darkModeEnabled: Boolean,
-    onDarkModeToggle: (Boolean) -> Unit
-){
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(16.dp)
-                .clickable { onDarkModeToggle(!darkModeEnabled) }
-        ) {
-            Switch(
-                checked = darkModeEnabled,
-                onCheckedChange = null,
-                modifier = Modifier.padding(end = 16.dp)
-            )
-            Text(text = "Dark Mode")
-
-        }
-
-    }
-
-}
-
-@Composable
-fun InfoCardSettings(){
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "Info",
-            )
-            Text(
-                text = "Info her...",
-            )
-        }
-    }
-}
-
-
-
+/*
 @Preview(showBackground = true)
 @Composable
-private fun PreviewSettingsScreenLight(){
+
+private fun PreviewSettingsScreenLight() {
     AppTheme(darkTheme = false) {
         val context = LocalContext.current
         val viewModelFactory = remember {
             SettingsScreenViewModel.SettingsViewModelFactory(
-                (context.applicationContext as SmackLipApplication).container)
+                (context.applicationContext as SmackLipApplication).container
+            )
 
         }
         SettingsScreen(navController = rememberNavController(), viewModelFactory)
     }
+
 }
+@Preview(showBackground = true)
+@Composable
+
+private fun PreviewSettingsScreen(){
+    AppTheme {
+        val settingsVM = viewModel<SettingsScreenViewModel> (
+            factory = viewModelFactory {
+                SettingsScreenViewModel(SmackLipApplication.container)
+            }
+        )
+        SettingsScreen(navController = rememberNavController(), settingsVM)
+    }
+}
+
+ */
 
 
 
