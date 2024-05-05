@@ -47,16 +47,6 @@ class SettingsRepositoryImpl (
     }
 
 
-    /*
-    override suspend fun setDarkMode(enabled: Boolean){
-        settingsStore.updateData { it.toBuilder().setDarkMode(enabled).build() }
-    }
-
-     */
-
-
-
-
     override suspend fun addFavoriteSurfArea(favorite: String){
         settingsStore.updateData {
             val builder = it.toBuilder()

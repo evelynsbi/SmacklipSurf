@@ -1,17 +1,21 @@
 package com.example.myapplication.ui.settings
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,9 +31,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.Settings
@@ -44,6 +56,8 @@ fun SettingsScreen(navController: NavController, settingsScreenViewModel: Settin
     val settingsUiState by settingsScreenViewModel.settingsUiState.collectAsState()
     val isDarkThemeEnabled by settingsScreenViewModel.isDarkThemEnabled.collectAsState()
     //val navController = NavigationManager.navController
+
+
     AppTheme(darkTheme = isDarkThemeEnabled) {
         Scaffold(
             bottomBar = {
@@ -54,56 +68,79 @@ fun SettingsScreen(navController: NavController, settingsScreenViewModel: Settin
                 modifier = Modifier
                     .padding(innerPadding)
             ) {
-                Box(modifier = Modifier.fillMaxSize()){
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier,
+
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.smacklip_logo),
                             contentDescription = "app logo",
+                            contentScale = ContentScale.FillBounds,
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .width(307.dp)
+                                .height(259.dp)
                                 .padding(16.dp)
                         )
                         Spacer(modifier = Modifier.height(14.dp))
-                    }
-                    Column(
-                    ) {
+
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize(),
-                            //horizontalAlignment = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             item {
                                 Card(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)
+                                        .width(265.dp)
+                                        .heightIn(min = 57.dp)
+                                        .animateContentSize(),
                                 ) {
                                     var expandedThemeCard by remember { mutableStateOf(false) }
-                                    Column(modifier = Modifier.padding(12.dp)) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(4.dp)
+                                    )
+                                     {
                                         Text(
-                                            text = "Velg app tema",
-                                            style = MaterialTheme.typography.headlineMedium
+                                            text = "Velg appmodus",
+                                            style = TextStyle(
+                                                fontSize = 16.sp,
+                                                fontFamily =
+                                                FontFamily.Default,
+                                                fontWeight = FontWeight(400),
+                                                //color = Color(0xFF4D5E6F),
+                                                textAlign = TextAlign.Center
+                                            ),
+                                            modifier = Modifier.fillMaxWidth()
                                         )
-                                        IconButton(onClick = {
-                                            expandedThemeCard = !expandedThemeCard
-                                        }) {
-                                            Icon(
-                                                Icons.Default.ExpandMore,
-                                                contentDescription = "Utvid"
-                                            )
-                                        }
-                                        // Expand theme card
+                                         IconButton(
+                                             onClick = { expandedThemeCard = !expandedThemeCard },
+                                             modifier = Modifier
+                                                 .align(Alignment.CenterHorizontally)
+                                         ) {
+                                             Icon(
+                                                 imageVector = if (expandedThemeCard)
+                                                     Icons.Filled.ExpandLess
+                                                 else
+                                                     Icons.Filled.ExpandMore,
+                                                 contentDescription = if (expandedThemeCard) "Skjul" else "Utvid",
+                                                 modifier = Modifier.rotate(if (expandedThemeCard) 180f else 0f)
+
+                                             )
+                                         }
+
                                         if (expandedThemeCard) {
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(8.dp),
+                                                    .wrapContentHeight(),
                                                 horizontalArrangement = Arrangement.SpaceBetween
                                             ) {
-                                                Text(text = if (isDarkThemeEnabled) "Dark Mode" else "Light Mode")
+                                                Text(text = if (isDarkThemeEnabled) "Switch for light mode" else "switch for dark mode")
                                                 Switch(
                                                     checked = isDarkThemeEnabled,
                                                     onCheckedChange = { isChecked ->
@@ -115,11 +152,18 @@ fun SettingsScreen(navController: NavController, settingsScreenViewModel: Settin
 
                                     }
                                 }
+                                Spacer(modifier = Modifier.height(14.dp))
                             }
+
                             item{
                                 InformationCard(title = "Hvorfor SmackLip Surf?", content = "Beskrivelse")
+                                Spacer(modifier = Modifier.height(14.dp))
                             }
                             item {
+                                InformationCard(title = "Hvordan beregner vi forhold?", content = "Beskrivelse")
+                                Spacer(modifier = Modifier.height(14.dp))
+                            }
+                            item{
                                 InformationCard(title = "Hvor henter vi data fra?", content = "Beskrivelse")
                             }
 
@@ -135,30 +179,52 @@ fun SettingsScreen(navController: NavController, settingsScreenViewModel: Settin
 
         }
 
-
-    }
-
-
-
-
 @Composable
 fun InformationCard(title: String, content: String) {
+    var expanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+            .width(265.dp)
+            .heightIn(min = 57.dp)
+            .animateContentSize(),
     ) {
-        var expanded by remember { mutableStateOf(false) }
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = title, style = MaterialTheme.typography.headlineMedium)
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(Icons.Default.ExpandMore, contentDescription = "Utvid")
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+        ) {
+            Text(
+                text = title,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontFamily =
+                    FontFamily.Default,
+                    fontWeight = FontWeight(400),
+                    //color = Color(0xFF4D5E6F),
+                    textAlign = TextAlign.Center
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+            IconButton(
+                onClick = { expanded = !expanded },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                ) {
+                Icon(
+                    imageVector = if (expanded)
+                        Icons.Filled.ExpandLess
+                    else
+                        Icons.Filled.ExpandMore,
+                    contentDescription = if (expanded) "Skjul" else "Utvid",
+                    modifier = Modifier.rotate(if (expanded) 180f else 0f)
+
+                )
             }
             //ekspandert innhold
             if (expanded) {
                 Text(
                     text = content,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )
 
@@ -170,23 +236,26 @@ fun InformationCard(title: String, content: String) {
 
 }
 
+
 /*
 @Preview(showBackground = true)
 @Composable
 
 private fun PreviewSettingsScreenLight() {
     AppTheme(darkTheme = false) {
-        val context = LocalContext.current
-        val viewModelFactory = remember {
-            SettingsScreenViewModel.SettingsViewModelFactory(
-                (context.applicationContext as SmackLipApplication).container
-            )
+        val settingsVm = viewModel<SettingsScreenViewModel>(
+            factory = viewModelFactory {
+                SettingsScreenViewModel(SmackLipApplication.container)
+            }
 
-        }
-        SettingsScreen(navController = rememberNavController(), viewModelFactory)
+        )
+        SettingsScreen(settingsVm)
+
+
     }
 
 }
+
 @Preview(showBackground = true)
 @Composable
 

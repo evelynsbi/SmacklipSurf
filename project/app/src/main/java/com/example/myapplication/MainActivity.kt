@@ -15,12 +15,10 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,7 +33,6 @@ import com.example.myapplication.ui.surfarea.DailySurfAreaScreenViewModel
 import com.example.myapplication.ui.surfarea.SurfAreaScreen
 import com.example.myapplication.ui.surfarea.SurfAreaScreenViewModel
 import com.example.myapplication.ui.theme.AppTheme
-import com.example.myapplication.ui.theme.LocalDarkTheme
 
 
 //TODO: vm skal ikke være sånn! Må ha en viewmodel factory, men slashscreen må ha tilgang på en viewmodel
@@ -43,19 +40,27 @@ import com.example.myapplication.ui.theme.LocalDarkTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        /*
+
         installSplashScreen().apply {
             setKeepOnScreenCondition{
                 SmackLipApplication.container.stateFulRepo.ofLfNext7Days.value.next7Days.isEmpty()
             }
         }
 
-
+         */
 
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
         setContent {
 
-
-            AppTheme( darkTheme = LocalDarkTheme.current) {
+            //foreløpig til jeg finner en bedre måte å få det over hele appen på
+            val settingsVm = viewModel<SettingsScreenViewModel>(
+                factory = viewModelFactory {
+                    SettingsScreenViewModel(SmackLipApplication.container)
+                }
+            )
+            val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
+            AppTheme( darkTheme = isDarkTheme) {
                 val isConnected by connectivityObserver.observe().collectAsState(
                     initial = false
                 )
@@ -118,10 +123,6 @@ fun SmackLipNavigation(){
             SettingsScreenViewModel(SmackLipApplication.container)
         }
     )
-    val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
-    CompositionLocalProvider(LocalDarkTheme provides isDarkTheme ) {
-
-    }
     val savm = viewModel<SurfAreaScreenViewModel>(
         factory = viewModelFactory {
             SurfAreaScreenViewModel(SmackLipApplication.container.stateFulRepo)
@@ -130,7 +131,7 @@ fun SmackLipNavigation(){
 
     NavHost(
         navController = navController,
-        startDestination = "HomeScreen",
+        startDestination = "SettingsScreen",
 
         ){
         composable("HomeScreen"){
@@ -158,7 +159,7 @@ fun SmackLipNavigation(){
             )
         }
         composable("SettingsScreen") {
-            SettingsScreen(navController = navController, settingsVm)
+            SettingsScreen(navController = navController,settingsVm)
         }
     }
 }
