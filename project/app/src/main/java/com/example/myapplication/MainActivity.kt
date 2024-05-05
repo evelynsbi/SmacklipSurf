@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,7 +41,6 @@ import com.example.myapplication.ui.theme.AppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*
 
         installSplashScreen().apply {
             setKeepOnScreenCondition{
@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-         */
 
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
         setContent {
