@@ -52,10 +52,9 @@ import com.example.myapplication.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 //@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SettingsScreen(navController: NavController, settingsScreenViewModel: SettingsScreenViewModel) {
+fun SettingsScreen(settingsScreenViewModel: SettingsScreenViewModel, navController: NavController) {
     val settingsUiState by settingsScreenViewModel.settingsUiState.collectAsState()
     val isDarkThemeEnabled by settingsScreenViewModel.isDarkThemEnabled.collectAsState()
-    //val navController = NavigationManager.navController
 
 
     AppTheme(darkTheme = isDarkThemeEnabled) {
@@ -235,43 +234,5 @@ fun InformationCard(title: String, content: String) {
     }
 
 }
-
-
-/*
-@Preview(showBackground = true)
-@Composable
-
-private fun PreviewSettingsScreenLight() {
-    AppTheme(darkTheme = false) {
-        val settingsVm = viewModel<SettingsScreenViewModel>(
-            factory = viewModelFactory {
-                SettingsScreenViewModel(SmackLipApplication.container)
-            }
-
-        )
-        SettingsScreen(settingsVm)
-
-
-    }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-
-private fun PreviewSettingsScreen(){
-    AppTheme {
-        val settingsVM = viewModel<SettingsScreenViewModel> (
-            factory = viewModelFactory {
-                SettingsScreenViewModel(SmackLipApplication.container)
-            }
-        )
-        SettingsScreen(navController = rememberNavController(), settingsVM)
-    }
-}
-
- */
-
-
 
 

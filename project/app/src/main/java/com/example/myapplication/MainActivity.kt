@@ -28,6 +28,7 @@ import com.example.myapplication.presentation.viewModelFactory
 import com.example.myapplication.ui.home.HomeScreen
 import com.example.myapplication.ui.home.HomeScreenViewModel
 import com.example.myapplication.ui.map.MapScreen
+import com.example.myapplication.ui.map.MapScreenViewModel
 import com.example.myapplication.ui.settings.SettingsScreen
 import com.example.myapplication.ui.settings.SettingsScreenViewModel
 import com.example.myapplication.ui.surfarea.DailySurfAreaScreenViewModel
@@ -36,7 +37,6 @@ import com.example.myapplication.ui.surfarea.SurfAreaScreenViewModel
 import com.example.myapplication.ui.theme.AppTheme
 
 
-//TODO: vm skal ikke være sånn! Må ha en viewmodel factory, men slashscreen må ha tilgang på en viewmodel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,13 +101,14 @@ fun ShowSnackBar() {
 }
 
 @Composable
-fun SmackLipNavigation(){
+fun SmackLipNavigation() {
     val navController = rememberNavController()
     NavigationManager.navController = navController
 
+    //viewmodels
     val dsvm = viewModel<DailySurfAreaScreenViewModel>(
         factory = viewModelFactory {
-            DailySurfAreaScreenViewModel() // send med argument
+            DailySurfAreaScreenViewModel(SmackLipApplication.container.stateFulRepo)
         }
     )
 
@@ -128,37 +129,36 @@ fun SmackLipNavigation(){
         }
     )
 
+    val mapVm = viewModel<MapScreenViewModel>(
+        factory = viewModelFactory {
+            MapScreenViewModel(SmackLipApplication.container.stateFulRepo)
+        }
+    )
+
+    //navigation
     NavHost(
         navController = navController,
         startDestination = "SettingsScreen",
 
         ){
         composable("HomeScreen"){
-            HomeScreen(hsvm){
-
-                navController.navigate("SurfAreaScreen/$it")
-            }
+            HomeScreen(hsvm, navController)
         }
         composable("SurfAreaScreen/{surfArea}") { backStackEntry ->
             val surfArea = backStackEntry.arguments?.getString("surfArea") ?: ""
-            SurfAreaScreen(surfAreaName = surfArea, savm)
+            SurfAreaScreen(surfAreaName = surfArea, savm, navController)
         }
         composable("DailySurfAreaScreen/{surfArea}/{dayIndex}") { backStackEntry ->
             val surfArea = backStackEntry.arguments?.getString("surfArea") ?: ""
             val dayIndex = backStackEntry.arguments?.getString("dayIndex")?.toInt() ?: 0 // TODO: Handle differently
-            DailySurfAreaScreen(surfAreaName = surfArea, daysFromToday = dayIndex, dsvm)
-
+            DailySurfAreaScreen(surfAreaName = surfArea, dayOfMonth = dayIndex, dsvm, navController)
         }
         composable("MapScreen"){
-            MapScreen(
-                onNavigateToSurfAreaScreen = {
-                    navController.navigate("SurfAreaScreen/$it")
-
-                }
-            )
+            MapScreen(mapScreenViewModel = mapVm, navController =  navController)
         }
         composable("SettingsScreen") {
-            SettingsScreen(navController = navController,settingsVm)
+
+            SettingsScreen(settingsVm, navController)
         }
     }
 }
