@@ -138,7 +138,7 @@ fun SmackLipNavigation() {
     //navigation
     NavHost(
         navController = navController,
-        startDestination = "SettingsScreen",
+        startDestination = "HomeScreen",
 
         ){
         composable("HomeScreen"){
