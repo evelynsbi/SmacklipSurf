@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -56,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.myapplication.NavigationManager
 import com.example.myapplication.R
 import com.example.myapplication.SmackLipApplication
 import com.example.myapplication.model.conditions.ConditionStatus
@@ -76,11 +76,13 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurfAreaScreen(
     surfAreaName: String,
     surfAreaScreenViewModel: SurfAreaScreenViewModel,
+    navController: NavController
 ) {
 
     val surfArea: SurfArea = SurfArea.entries.find {
@@ -95,9 +97,7 @@ fun SurfAreaScreen(
 
     val alerts = surfAreaScreenUiState.alertsSurfArea
 
-
     val formatter = DateTimeFormatter.ofPattern("EEE", Locale("no", "NO"))
-    val navController = NavigationManager.navController
 
     var showAlert by remember { mutableStateOf(false) }
     //var alertShowingNow by remember { mutableStateOf(false) }
@@ -109,6 +109,7 @@ fun SurfAreaScreen(
                     navigationIcon = {
                         IconButton(onClick = { navController?.popBackStack() }) {
                             Column(
+
                                 modifier = Modifier
                                     .height(50.dp)
                             ) {
@@ -123,14 +124,23 @@ fun SurfAreaScreen(
 
                             }
                         }
-                    },
-                    actions = {
-                        if (alerts.isNotEmpty()) {
-                            IconButton(onClick = {
-                                showAlert = true
-                            }) {
+
+                    }
+                },
+                actions = {
+                    if (alerts.isNotEmpty()) {
+                        IconButton(onClick = {
+                            showAlert = true
+                        },
+                            modifier = Modifier.fillMaxHeight().padding(end = 8.dp)
+                        ) {
+                            alerts.first().properties?.awarenessLevel?.let {
+                                getIconBasedOnAwarenessLevel(
+                                    it
+                                )
+                            }?.let { painterResource(id = it) }?.let {
                                 Image(
-                                    painter = painterResource(id = R.drawable.icon_awareness_yellow_outlined),
+                                    painter = it,
                                     contentDescription = "alert"
                                 )
                             }
@@ -152,6 +162,7 @@ fun SurfAreaScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
 
                     item {
                         val surfAreaDataForDay: Map<LocalDateTime, DataAtTime> = try {
@@ -177,14 +188,11 @@ fun SurfAreaScreen(
                                     headerIcon = surfAreaDataForDay[time]!!.symbolCode
                                 }
                             }
-                            HeaderCard(surfArea = surfArea, icon = headerIcon, LocalDateTime.now())
-                        } else {
-                            HeaderCard(
-                                surfArea = surfArea,
-                                icon = R.drawable.spm.toString(),
-                                LocalDateTime.now()
-                            )
-                        }
+
+                        HeaderCard(surfArea = surfArea, icon = headerIcon, LocalDateTime.now())
+                    } else {
+                            HeaderCard(surfArea = surfArea, icon = R.drawable.spm.toString(), LocalDateTime.now())
+                    }
                     }
                     item {
                         LazyRow(
@@ -577,10 +585,9 @@ private fun PreviewSurfAreaScreen() {
         }
     )
     AppTheme {
-        SurfAreaScreen("Solastranden", savm)
+        SurfAreaScreen("Solastranden", savm, rememberNavController())
         //DayPreviewCard()
         //HeaderCard()
         //InfoCard()
     }
 }
-
