@@ -111,7 +111,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
                                 isSearchActive.value = isActive
                             },
                             surfAreas = SurfArea.entries.toList(),
-                            onNavigateToSurfAreaScreen = onNavigateToSurfAreaScreen
+                            navController = navController
                         )
                     }
                 },
@@ -448,7 +448,7 @@ fun SurfAreaCard(
             .wrapContentSize()
             //.padding(start = 8.dp, top = 2.dp, end = 10.dp, bottom = 10.dp)
             .clickable(
-                onClick = { onNavigateToSurfAreaScreen(surfArea.locationName) }),
+                onClick = { navController.navigate("SurfAreaScreen/${surfArea.locationName}") }),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
