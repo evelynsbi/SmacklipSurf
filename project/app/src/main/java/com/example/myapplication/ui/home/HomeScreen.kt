@@ -48,8 +48,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -97,38 +95,24 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.background(MaterialTheme.colorScheme.inversePrimary),
-                title = {
-                    Column(
-                        modifier = Modifier.padding(top = 12.dp) // Adjust padding as needed
-                    ) {
-                        SearchBar(
-                            onQueryChange = {},
-                            isSearchActive = isSearchActive.value,
-                            onActiveChanged = { isActive ->
-                                isSearchActive.value = isActive
-                            },
-                            surfAreas = SurfArea.entries.toList(),
-                            navController = navController
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.inversePrimary)
-            )
-
-        },
         bottomBar = {
             BottomBar(navController = navController)
         }
     ) { innerPadding ->
-        Spacer(modifier = Modifier.height(20.dp))
         Column(
             modifier = Modifier
                 .padding(innerPadding)
             //.verticalScroll(rememberScrollState())
         ) {
+            SearchBar(
+                onQueryChange = {},
+                isSearchActive = isSearchActive.value,
+                onActiveChanged = { isActive ->
+                    isSearchActive.value = isActive
+                },
+                surfAreas = SurfArea.entries.toList(),
+                navController = navController
+            )
             Box(modifier = Modifier.fillMaxSize()){
                 Column (modifier = Modifier.fillMaxSize()
                 ){
