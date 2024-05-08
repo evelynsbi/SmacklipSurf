@@ -30,9 +30,9 @@ class DefaultAppContainer(
         RepositoryImpl()
     }
 
-    override val settingsRepository: SettingsRepository =
+    override val settingsRepository: SettingsRepository by lazy {
         SettingsRepositoryImpl(settingsStore)
-
+    }
     override val settingsViewModel: SettingsScreenViewModel by lazy{
         SettingsScreenViewModel(this)
     }
