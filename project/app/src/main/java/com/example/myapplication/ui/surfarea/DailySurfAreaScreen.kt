@@ -182,11 +182,11 @@ fun DailySurfAreaScreen(
                                     "DSAscreen",
                                     "Waveperiods ${hour} out of bounds for waveperiods of size ${dailySurfAreaScreenUiState.wavePeriods.size}"
                                 )
-                                0.0
+                                -1.0
                             }
 
                             val conditionStatus: ConditionStatus? = try {
-                                dailySurfAreaScreenUiState.conditionStatuses[dayOfMonth][time]
+                                dailySurfAreaScreenUiState.conditionStatuses[time]
                             } catch (e: IndexOutOfBoundsException) {
                                 null
                             }
@@ -303,7 +303,7 @@ fun AllInfoCard(
                         tint=  MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .size(17.dp)
-                            .rotate(rotationAngleWind - 45)
+                            .rotate(rotationAngleWind - 135)
                     )
                 }
 
@@ -330,11 +330,19 @@ fun AllInfoCard(
 
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    Text(
-                        text = "${wavePeriod?.toInt()} sek",
-                        style = AppTypography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    if (wavePeriod != null && wavePeriod >= 0) {
+                        Text(
+                            text = "${wavePeriod.toInt()} sek",
+                            style = AppTypography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        Text(
+                            text = "-- sek",
+                            style = AppTypography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
 
                     Spacer(modifier = Modifier.width(6.dp))
 
@@ -344,7 +352,7 @@ fun AllInfoCard(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .size(17.dp)
-                            .rotate(rotationAngleWaveDir - 45)
+                            .rotate(rotationAngleWaveDir - 135)
                     )
                 }
 

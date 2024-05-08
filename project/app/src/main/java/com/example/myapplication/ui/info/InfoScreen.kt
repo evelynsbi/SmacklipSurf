@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,7 @@ import com.example.myapplication.R
 import com.example.myapplication.Settings
 import com.example.myapplication.ui.common.composables.BottomBar
 import com.example.myapplication.ui.theme.AppTheme
+import com.example.myapplication.ui.theme.AppTypography
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -157,28 +159,33 @@ fun InfoScreen(infoScreenViewModel: InfoScreenViewModel, navController: NavContr
                             }
 
                             item{
-                                InformationCard(title = "Hvorfor SmackLip Surf?", content = "Beskrivelse")
+                                InformationCard(
+                                    title = "Hvorfor SmackLip Surf?",
+                                    content = stringResource(id = R.string.hvorfor_smacklip)
+                                )
                                 Spacer(modifier = Modifier.height(14.dp))
                             }
                             item {
-                                InformationCard(title = "Hvordan beregner vi forhold?", content = "Beskrivelse")
+                                InformationCard(
+                                    title = "Hvordan beregner vi forhold?",
+                                    content = stringResource(id = R.string.beregner_forhold)
+                                )
                                 Spacer(modifier = Modifier.height(14.dp))
                             }
                             item{
-                                InformationCard(title = "Hvor henter vi data fra?", content = "Beskrivelse")
+                                InformationCard(
+                                    title = "Hvor henter vi data fra?",
+                                    content = stringResource(id = R.string.henter_data)
+                                )
                             }
-
                         }
-
-
                     }
-
-                    }
-                }
-
             }
-
         }
+
+    }
+
+}
 
 @Composable
 fun InformationCard(title: String, content: String) {
@@ -194,8 +201,9 @@ fun InformationCard(title: String, content: String) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp)
+                .padding(10.dp)
         ) {
+
             Text(
                 text = title,
                 style = TextStyle(
@@ -226,11 +234,13 @@ fun InformationCard(title: String, content: String) {
                 Text(
                     text = content,
                     style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
                 )
 
 
             }
+
 
         }
     }
