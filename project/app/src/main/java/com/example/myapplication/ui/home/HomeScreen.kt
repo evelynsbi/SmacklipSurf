@@ -114,8 +114,10 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
                 navController = navController
             )
             Box(modifier = Modifier.fillMaxSize()){
-                Column (modifier = Modifier.fillMaxSize()
+                Column (modifier = Modifier
+                    .padding(horizontal = 10.dp)
                 ){
+
                     FavoritesList(
                         favorites = favoriteSurfAreas,
                         ofLfNow = homeScreenUiState.ofLfNow,
@@ -129,6 +131,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
                             .padding(horizontal = 10.dp)
                     ){
                         Text(
+                            modifier = Modifier
+                                .padding(vertical = 10.dp),
                             text = "Alle lokasjoner",
                             style = AppTypography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -298,10 +302,8 @@ fun FavoritesList(
     homeScreenViewModel: HomeScreenViewModel,
     navController: NavController
 ) {
-    Spacer(modifier = Modifier.height(10.dp))
     Row(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
