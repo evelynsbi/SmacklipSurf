@@ -118,6 +118,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
                     .padding(horizontal = 10.dp)
                 ){
 
+
                     FavoritesList(
                         favorites = favoriteSurfAreas,
                         ofLfNow = homeScreenUiState.ofLfNow,
@@ -304,7 +305,7 @@ fun FavoritesList(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 10.dp),
+            .padding(horizontal = 10.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -312,7 +313,8 @@ fun FavoritesList(
             style = AppTypography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
 
-            modifier = Modifier.weight(1f, true)
+            modifier = Modifier
+                .weight(1f, true)
         )
         Button(
             onClick = { homeScreenViewModel.clearAllFavorites()},
@@ -326,7 +328,7 @@ fun FavoritesList(
                 end = 8.dp
             ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
+                containerColor = MaterialTheme.colorScheme.inverseOnSurface
             )
         ) {
             Text(text="Tøm favoritter",
@@ -335,6 +337,7 @@ fun FavoritesList(
 
         }
     }
+
     if (favorites.isNotEmpty()) {
         LazyRow (
             modifier = Modifier
