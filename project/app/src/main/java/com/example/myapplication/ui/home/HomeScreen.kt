@@ -123,13 +123,15 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
             BottomBar(navController = navController)
         }
     ) { innerPadding ->
+        Spacer(modifier = Modifier.height(20.dp))
         Column(
             modifier = Modifier
                 .padding(innerPadding)
             //.verticalScroll(rememberScrollState())
         ) {
             Box(modifier = Modifier.fillMaxSize()){
-                Column (modifier = Modifier.fillMaxSize()){
+                Column (modifier = Modifier.fillMaxSize()
+                ){
                     FavoritesList(
                         favorites = favoriteSurfAreas,
                         ofLfNow = homeScreenUiState.ofLfNow,
@@ -145,7 +147,8 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
                         Text(
                             text = "Alle lokasjoner",
                             style = AppTypography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant                            )
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
@@ -311,10 +314,11 @@ fun FavoritesList(
     homeScreenViewModel: HomeScreenViewModel,
     navController: NavController
 ) {
+    Spacer(modifier = Modifier.height(10.dp))
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp),
+            .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
