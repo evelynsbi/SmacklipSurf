@@ -51,14 +51,7 @@ class MainActivity : ComponentActivity() {
 
         val connectivityObserver = NetworkConnectivityObserver(applicationContext)
         setContent {
-
-            //foreløpig til jeg finner en bedre måte å få det over hele appen på
-            val settingsVm = viewModel<SettingsScreenViewModel>(
-                factory = viewModelFactory {
-                    SettingsScreenViewModel(SmackLipApplication.container)
-                }
-            )
-            val isDarkTheme by settingsVm.isDarkThemEnabled.collectAsState(initial = false)
+            val isDarkTheme by SmackLipApplication.container.settingsViewModel.isDarkThemEnabled.collectAsState(initial = false)
             AppTheme( useDarkTheme = isDarkTheme) {
                 val isConnected by connectivityObserver.observe().collectAsState(
                     initial = false
