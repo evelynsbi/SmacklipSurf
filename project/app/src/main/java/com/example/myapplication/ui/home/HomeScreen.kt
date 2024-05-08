@@ -133,7 +133,7 @@ fun HomeScreen(homeScreenViewModel: HomeScreenViewModel, navController: NavContr
                     ){
                         Text(
                             modifier = Modifier
-                                .padding(vertical = 10.dp),
+                                .padding(vertical = 15.dp),
                             text = "Alle lokasjoner",
                             style = AppTypography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -305,7 +305,7 @@ fun FavoritesList(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 10.dp, vertical = 5.dp),
+            .padding(horizontal = 10.dp, vertical = 0.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
