@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,7 +54,7 @@ import com.example.myapplication.ui.theme.AppTheme
 //@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SettingsScreen(settingsScreenViewModel: SettingsScreenViewModel, navController: NavController) {
-    val settingsUiState by settingsScreenViewModel.settingsUiState.collectAsState()
+    //val settingsUiState by settingsScreenViewModel.settingsUiState.collectAsState()
     val isDarkThemeEnabled by settingsScreenViewModel.isDarkThemEnabled.collectAsState()
 
 
@@ -96,6 +97,8 @@ fun SettingsScreen(settingsScreenViewModel: SettingsScreenViewModel, navControll
                                         .width(265.dp)
                                         .heightIn(min = 57.dp)
                                         .animateContentSize(),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                                 ) {
                                     var expandedThemeCard by remember { mutableStateOf(false) }
                                     Column(
@@ -186,6 +189,8 @@ fun InformationCard(title: String, content: String) {
             .width(265.dp)
             .heightIn(min = 57.dp)
             .animateContentSize(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier
