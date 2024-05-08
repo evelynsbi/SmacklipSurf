@@ -9,12 +9,12 @@ import com.example.myapplication.data.settings.SettingsRepositoryImpl
 import com.example.myapplication.data.settings.SettingsSerializer
 import com.example.myapplication.data.smackLip.Repository
 import com.example.myapplication.data.smackLip.RepositoryImpl
-import com.example.myapplication.ui.settings.SettingsScreenViewModel
+import com.example.myapplication.ui.info.InfoScreenViewModel
 
 
 private const val DATA_STORE_FILE_NAME = "settings.pb"
 interface AppContainer {
-    val settingsViewModel: SettingsScreenViewModel
+    val infoViewModel: InfoScreenViewModel
     val settingsRepository: SettingsRepository
     val stateFulRepo: Repository
 }
@@ -33,8 +33,8 @@ class DefaultAppContainer(
     override val settingsRepository: SettingsRepository by lazy {
         SettingsRepositoryImpl(settingsStore)
     }
-    override val settingsViewModel: SettingsScreenViewModel by lazy{
-        SettingsScreenViewModel(this)
+    override val infoViewModel: InfoScreenViewModel by lazy{
+        InfoScreenViewModel(this)
     }
 
 

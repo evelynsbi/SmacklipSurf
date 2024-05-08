@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.settings
+package com.example.myapplication.ui.info
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -14,16 +14,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-sealed class SettingsUiState{
-    object Loading : SettingsUiState()
-    data class Loaded(val settings: Settings): SettingsUiState()
+sealed class InfoUiState{
+    data object Loading : InfoUiState()
+    data class Loaded(val settings: Settings): InfoUiState()
 }
-class SettingsScreenViewModel(
+class InfoScreenViewModel(
     private val container: AppContainer,
 ) : ViewModel() {
-    private val _settingsUiState: MutableStateFlow<SettingsUiState> =
-        MutableStateFlow(SettingsUiState.Loading)
-    val settingsUiState: StateFlow<SettingsUiState> = _settingsUiState.asStateFlow()
+    private val _infoUiState: MutableStateFlow<InfoUiState> =
+        MutableStateFlow(InfoUiState.Loading)
+    val infoUiState: StateFlow<InfoUiState> = _infoUiState.asStateFlow()
     val settings: Flow<Settings> = container.settingsRepository.settingsFlow
     val isDarkThemEnabled: StateFlow<Boolean> = container.settingsRepository.settingsFlow
         .map {  it.theme == Settings.Theme.DARK}
@@ -34,7 +34,7 @@ class SettingsScreenViewModel(
     init {
         viewModelScope.launch {
             container.settingsRepository.settingsFlow.collect{
-                _settingsUiState.value = SettingsUiState.Loaded(it)
+                _infoUiState.value = InfoUiState.Loaded(it)
             }
         }
     }
@@ -45,21 +45,5 @@ class SettingsScreenViewModel(
             Log.d("Dark Mode", "Successfully updated theme to: $theme")
         }
     }
-    /*
-
-    class SettingsViewModelFactory(
-        private val appContainer: AppContainer
-    ) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(SettingsScreenViewModel::class.java)){
-                @Suppress("UNCHECKED_CAST")
-                return SettingsScreenViewModel(appContainer) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel Class")
-        }
-    }
-
- */
-
 
 }

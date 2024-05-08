@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.settings
+package com.example.myapplication.ui.info
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -53,9 +53,9 @@ import com.example.myapplication.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 //@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SettingsScreen(settingsScreenViewModel: SettingsScreenViewModel, navController: NavController) {
-    //val settingsUiState by settingsScreenViewModel.settingsUiState.collectAsState()
-    val isDarkThemeEnabled by settingsScreenViewModel.isDarkThemEnabled.collectAsState()
+fun InfoScreen(infoScreenViewModel: InfoScreenViewModel, navController: NavController) {
+    //val infoUiState by infoScreenViewModel.infoUiState.collectAsState()
+    val isDarkThemeEnabled by infoScreenViewModel.isDarkThemEnabled.collectAsState()
 
 
     AppTheme(useDarkTheme = isDarkThemeEnabled) {
@@ -130,7 +130,6 @@ fun SettingsScreen(settingsScreenViewModel: SettingsScreenViewModel, navControll
                                                  else
                                                      Icons.Filled.ExpandMore,
                                                  contentDescription = if (expandedThemeCard) "Skjul" else "Utvid",
-                                                 modifier = Modifier.rotate(if (expandedThemeCard) 180f else 0f)
 
                                              )
                                          }
@@ -146,7 +145,7 @@ fun SettingsScreen(settingsScreenViewModel: SettingsScreenViewModel, navControll
                                                 Switch(
                                                     checked = isDarkThemeEnabled,
                                                     onCheckedChange = { isChecked ->
-                                                        settingsScreenViewModel.updateTheme(if (isChecked) Settings.Theme.DARK else Settings.Theme.LIGHT)
+                                                        infoScreenViewModel.updateTheme(if (isChecked) Settings.Theme.DARK else Settings.Theme.LIGHT)
                                                     }
                                                 )
                                             }
@@ -201,12 +200,10 @@ fun InformationCard(title: String, content: String) {
                 text = title,
                 style = TextStyle(
                     fontSize = 16.sp,
-                    fontFamily =
-                    FontFamily.Default,
                     fontWeight = FontWeight(400),
-                    //color = Color(0xFF4D5E6F),
                     textAlign = TextAlign.Center
                 ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
             )
             IconButton(
