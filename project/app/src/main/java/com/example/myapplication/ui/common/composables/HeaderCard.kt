@@ -36,7 +36,7 @@ fun HeaderCard(surfArea: SurfArea, icon : String, date: LocalDateTime) {
     val formattedDate1 = formatter1.format(date)
 
     //to get icon
-    val recourseUtils : RecourseUtils = RecourseUtils()
+    val recourseUtils = RecourseUtils()
 
 
     Box(
