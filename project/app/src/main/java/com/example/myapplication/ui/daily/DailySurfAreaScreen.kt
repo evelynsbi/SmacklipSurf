@@ -140,6 +140,7 @@ fun DailySurfAreaScreen(
                         val futureDaysMap = surfAreaDataForDay.keys.groupBy { it.toLocalDate() }
                             .filterKeys { it.isAfter(currentDay) }
                         val nextDayTimes = futureDaysMap.entries.firstOrNull()?.value?.sorted() ?: emptyList()
+                        // checking if more than 1 hour is remaining and then finding icon for middle hour
                         headerTime = if (nextDayTimes.size > 1) nextDayTimes[nextDayTimes.size / 2] else nextDayTimes.firstOrNull() ?: currentTime
                         headerIcon = surfAreaDataForDay[headerTime]?.symbolCode ?: headerIcon
                     }
