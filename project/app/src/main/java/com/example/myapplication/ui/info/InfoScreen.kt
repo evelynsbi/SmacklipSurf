@@ -140,7 +140,7 @@ fun InfoScreen(infoScreenViewModel: InfoScreenViewModel, navController: NavContr
                                                     .wrapContentHeight(),
                                                 horizontalArrangement = Arrangement.SpaceBetween
                                             ) {
-                                                Text(text = if (isDarkThemeEnabled) "Switch for light mode" else "switch for dark mode")
+                                                Text(text = if (isDarkThemeEnabled) "Bytt til Light Mode " else "Bytt til Dark Mode")
                                                 Switch(
                                                     checked = isDarkThemeEnabled,
                                                     onCheckedChange = { isChecked ->
