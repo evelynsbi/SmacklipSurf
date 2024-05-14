@@ -112,8 +112,8 @@ fun DailySurfAreaScreen(
             ) {
                 val currentTime = LocalDateTime.now()
                 val currentDay = currentTime.toLocalDate()
-                val currentHour = LocalDateTime.now().hour
-                //val formattedCurrentHour = String.format("%02d", currentHour)
+                val currentHour = currentTime.hour
+
 
                 var headerIcon = "default_icon"
                 val headerTime: LocalDateTime
