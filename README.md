@@ -1,3 +1,4 @@
+![Image](https://github.com/user-attachments/assets/7d9182d9-c269-4b2b-be3e-212211554492)
 # Smacklip Surf
 ## Team 8:
 Ørjan Hammer Sylta (orjanhsy)\
