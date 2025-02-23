@@ -1,19 +1,19 @@
-# team-8
-## Gruppe 8:
+# Smacklip Surf
+## Team 8:
 Ørjan Hammer Sylta (orjanhsy)\
 Julie Alme  (julikal)\
 Muna Isman (Munaai)\
 Agnes (agneshb)\
-Evelyn (evelynsb)\
-Tobias (tobiawi)\
+Evelyn Bizimana (evelynsb)\
+Tobias (tobiawi)
 
 
-## Dokumentasjon
-Applikasjonens er dokumentert gjennom kommentarer i koden. Markdown filen ARCHITECTURE.md gir oversikt over arkitekturen ved en arkitekturtegning, en tekstlig beskrivelse og en oversikt over API-nivå, verktøy og de API-ene vi har benyttet.
+## Documentation
+The application is documented through comments in the code. The Markdown file ARCHITECTURE.md provides an overview of the architecture through an architecture drawing, a textual description, and an overview of the API levels, tools and the APIs we have used.
 
 
-## Informasjon om biblioteker
-Se mer i ARCHITECTURE.md
+## Information about libraries
+View more in ARCHITECTURE.md
 
 * Proto DataStore
 * KTOR
@@ -22,7 +22,7 @@ Se mer i ARCHITECTURE.md
 * Jetpack Compose
 * Material3
 
-## Redegjørelse for varsler
-* Vi har én "warning" i IDE-en i SurfAreaScreen og DailyScreen.  Material3.TopAppBar biblioteket er avviklet. Vi så ikke en rask måte å fikse det på så vi valgte å fortsette å benytte det.
-* I modelmappen har mange klasser warnings på atributtnavn siden vi ikke har brukt @SerializedName
-* Vi får en del "warnings" i Gradle på at en del av bibliotekene ikke er helt oppdatert. 
+## Explanation of warnings
+* We have one warning in the IDE in SurfAreaScreen and DailyScreen. The Material3.TopAppBar library has been deprecated. We didn't see a quick way to manage it, so we chose to keep using it.
+* In the model folder, many classes have warnings on attribute names, as we didn't use @SerializedName.
+* We get some warnings in Gradle indicating that some of the libraries are not fully updated.
