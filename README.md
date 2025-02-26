@@ -1,11 +1,3 @@
-![Image](https://github.com/user-attachments/assets/7d9182d9-c269-4b2b-be3e-212211554492)
-## Team 8:
-Ørjan Hammer Sylta (orjanhsy)\
-Julie Alme  (julikal)\
-Muna Isman (Munaai)\
-Agnes (agneshb)\
-Evelyn Bizimana (evelynsb)\
-Tobias (tobiawi)
 
 
 ## Documentation
